@@ -25,3 +25,43 @@
         </div>
     </div>
 </div>
+<div
+    [ngClass]="{'rap-rec-mid-header': module === module_rec, 'rap-pal-mid-header': module === module_pal, 'rap-sci-mid-header': module === module_sci, 'rap-generic-mid-header': module === module_generic || !module}"></div>
+
+<div class="row m-0" style="background-color: black;">
+    <div class="col-12">
+        <nav class="navbar navbar-expand-md navbar-dark">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" (click)="navbarCollapsed = !navbarCollapsed">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-center" id="navbarNav" [ngbCollapse]="navbarCollapsed" (click)="navbarCollapsed = true">
+                    @if (!currentUser) {
+                        <ul class="navbar-nav">
+                            <li class="nav-item" [routerLinkActive]="['active']">
+                                <a title="home" class="nav-link" [routerLink]="['/landing']">Home</a>
+                            </li>
+                            <li class="nav-item" [routerLinkActive]="['active']">
+                                <a title="SRP" class="nav-link" [routerLink]="['home-srp']">Module - 1</a>
+                            </li>
+                            <li class="nav-item" [routerLinkActive]="['active']">
+                                <a title="Paleontolgy" class="nav-link" [routerLink]="['home-paleo']">Module - 2</a>
+                            </li>
+                            <li class="nav-item" [routerLinkActive]="['active']">
+                                <a title="General Science" class="nav-link" [routerLink]="['home-gensc']">Module - 3</a>
+                            </li>
+                            <li class="nav-item" [routerLinkActive]="['active']">
+                                <a title="Login" class="nav-link" [routerLink]="[path_login]">Login / Register</a>
+                            </li>
+                            <li class="nav-item" [routerLinkActive]="['active']">
+                                <a title="Help" class="nav-link" [routerLink]="['help']" target="_blank">Help</a>
+                            </li>
+                        </ul>
+                    }
+                </div>
+            </div>
+        </nav>
+    </div>
+</div>
+<div
+    [ngClass]="{'rap-rec-bottom-header': module === module_rec, 'rap-pal-bottom-header': module === module_pal, 'rapt-sci-bottom-header': module === module_sci, 'raptor-generic-bottom-header': module === module_generic || !module}"></div>
