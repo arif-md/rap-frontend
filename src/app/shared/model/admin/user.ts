@@ -14,7 +14,7 @@ export class User extends BaseModel {
     orcId!: string;
     isExternalUser!: boolean;
     passwordResetToken?: string;
-    raptorAdmin!: boolean;
+    rapAdmin!: boolean;
     loginRole!: string;
     loginRoleDesc!: string;
     loginRoleAssocId!: number;
@@ -43,7 +43,7 @@ export class UserAdapter implements Rest2Form<User> {
         result.modifiedBy = item.modifiedBy;
         result.modifiedDate = item.modifiedDate;
         result.isExternalUser = item.isExternalUser;
-        result.raptorAdmin = item.raptorAdmin;
+        result.rapAdmin = item.rapAdmin;
         result.loginRole = item.loginRole;
         result.loginRoleDesc = item.loginRoleDesc;
         result.loginRoleAssocId = item.loginRoleAssocId;

@@ -1,0 +1,40 @@
+<h2 mat-dialog-title class="text-center">
+    @if (data.icon===CONFIRM_QUESTION_ICON) {
+      <span class="material-icons-outlined md-4 pt-3 accent-color">{{data.icon}}</span><br>{{data.title}}<hr>
+    }
+    @if (data.icon===CONFIRM_ERROR_ICON) {
+      <span class="material-icons-outlined md-4 pt-3 error-text">{{data.icon}}</span><br>{{data.title}}<hr>
+    }
+    @if (data.icon===CONFIRM_DEFAULT_ICON) {
+      <span class="material-icons-outlined md-4 pt-3 warn-color">{{data.icon}}</span><br>{{data.title}}<hr>
+    }
+    @if (data.icon===CONFIRM_SUCCESS_ICON) {
+      <span class="material-icons-outlined md-4 pt-3 success-color">{{data.icon}}</span><br>{{data.title}}<hr>
+    }
+    @if (data.icon === CONFIRM_PARENT_ORG_IMG) {
+        <img src="assets/img/parent_org_seal.webp" class="alert-icon">
+    }
+</h2>
+
+<mat-dialog-content class="mat-typography">
+  <div class="text-center" [innerHTML]="data.text"></div>
+  @if (data.showReason) {
+    <mat-form-field appearance="outline">
+      <mat-label>Reason</mat-label>
+  <textarea rows="10" [required]="!!data.requireReason" matInput #reason maxlength="2000" [(ngModel)]="reasonText"></textarea>
+  <mat-hint align="end">{{reason.value.length || 0}}/2000</mat-hint>
+      <mat-error>Enter the reason for the cancellation</mat-error>
+    </mat-form-field>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="center">
+  @if (!data.hideCancelButton) {
+    <button mat-button mat-raised-button color="warn" mat-dialog-close>{{data.cancelButtonText}}</button>
+  }
+  @if (data.showReason) {
+    <button mat-button mat-raised-button color="primary" [disabled]="!reasonText && data.requireReason" [mat-dialog-close]="{confirmed: true, reasonText: reasonText}" cdkFocusInitial>{{data.confirmButtonText}}</button>
+  } @else {
+    <button mat-button mat-raised-button color="primary" [mat-dialog-close]="true" cdkFocusInitial>{{data.confirmButtonText}}</button>
+  }
+</mat-dialog-actions>

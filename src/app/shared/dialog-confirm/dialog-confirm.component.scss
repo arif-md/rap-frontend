@@ -1,0 +1,17 @@
+@use "../../../variables" as *;
+
+.material-icons-outlined.md-4 {
+  font-size: 5rem;
+}
+
+.accent-color {
+  color: $sharedAccentColor;
+}
+
+.warn-color {
+  color: $recOrange;
+}
+
+.success-color {
+  color: $successColor;
+}
