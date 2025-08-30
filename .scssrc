@@ -1,0 +1,4 @@
+// SCSS path alias configuration for Angular
+// This file enables the @app alias for SCSS imports
+
+@use "../src/variables" as *;
