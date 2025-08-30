@@ -1,0 +1,57 @@
+@use "../variables" as *;
+
+html {
+    height: 100%;
+  }
+  body {
+    font: 20px Montserrat, sans-serif;
+    line-height: 1.8;
+    color: $bodyColor;
+    height: 100%;
+}
+.rap-content {
+    width: 100%;
+    padding: 0;
+    /* min-height:535px ;  */
+    min-height: 60vmin;
+
+     /* ! This is s filler for pages with little content */
+    /* max-height: calc(100% + 350px); */
+    /* overflow-y: scroll; */
+    /* padding: 0px 10% !important; */
+    /* margin-top: 60px !important; */
+}
+p {font-size: 16px;}
+
+.bg-blm-topo {
+    background-image: url('../assets/img/bgnd-banner-topo.jpg') ;
+    padding: 0;
+    background-repeat: no-repeat;
+    background-color: black;
+    background-size: 100%;
+    /* background-size: cover; */
+}
+
+.dark-text-span{
+	color: black;
+}
+.container-fluid {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.form-border {
+  background-color: $outerBorderColor;
+  padding: 1px;
+}
+
+.form-body {
+  background-color: $formBodyColor;
+  margin: 10px;
+  padding: 10px;
+}
+
+#application-title {
+  background-color: black;
+  padding: 5px;
+}

@@ -1,0 +1,42 @@
+$asterisk-color: rgba(244, 67, 54, 1);
+$recErrorHighlighting: #DA5235;
+$readOnlyTextColor: rgba(0,0,0,0.68);
+$readOnlyBackgroundColor: rgba(127, 127, 127, 0.1);
+$readOnlyOutlineColor: rgba(0, 0, 0, 0.06);
+$checkboxRadioColor: #0069D9;
+$checkboxDisabledColor: grey;
+$outerBorderColor: #f4dea6;
+$bodyColor: #f5f6f7;
+$bodyFontColor: #212529;
+$formGroupLabelColor: #fff;
+$white: white;
+$formBodyColor: $white;
+$recOrange: rgb(255, 147, 27);
+$paleoAccentColor: rgba(13, 124, 165, 1);
+$sciAccentColor: #9FCF6E;
+$sharedAccentColor: $paleoAccentColor;
+$khakiBtnColor: rgba(240, 230, 140, 0.8);
+$confirmBlueColor: rgba(0, 105, 217, 1);
+$successColor: $confirmBlueColor;
+$swalConfirmColor: $confirmBlueColor;
+$completeButtonColor: green;
+$releaseButtonColor: $sharedAccentColor;
+$secondaryButtonColor: rgba(108, 117, 125, 1);
+
+$linkColor: #007bff;
+$linkHoverColor: #0056b3;
+
+$scienceLinkColor: $linkColor;
+$scienceHoverLinkColor: $linkHoverColor;
+
+$paleoLinkColor: $linkColor;
+$paleoHoverLinkColor: $linkHoverColor;
+
+$recAccentColor: rgba($recOrange, 1);
+
+$recCommercialTableHeaderColor: rgba(144, 238, 144, 0.8);
+$recCompetitiveTableHeaderColor: rgba(255, 255, 0, 0.5);
+$recCommAndCompTableHeaderColor: rgb(173, 255, 47, 0.7);
+$recOrganizedGroupTableHeaderColor: rgba(68, 162, 248, 0.8);
+$recVendingTableHeaderColor: rgba(222, 106, 165, 0.8);
+$recUseReportTableHeaderColor: rgba($recOrange, 0.5);
