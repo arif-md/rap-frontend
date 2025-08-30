@@ -1,5 +1,6 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { User } from '@app/shared/model/admin';
 import { ApplicationService } from '@app/global-services';
 import { NgClass } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
@@ -15,10 +16,12 @@ import { MODULE_PAL, MODULE_REC, MODULE_SCI, PATH_LOGIN } from '@app/shared/mode
         NgClass,
         RouterLink,
         RouterLinkActive,
+        NgbCollapse
     ]
 })
 export class HeaderComponent implements OnInit, OnDestroy {
     private applicationService = inject(ApplicationService);
+    currentUser: User | null;
     dirty: boolean;
     moduleSubscription!: Subscription;
     module!: string;
@@ -35,6 +38,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.dirty = false;
         this.envName = 'Local';
         this.appVersion = '0.0.1-SNAPSHOT';
+        this.currentUser = null;
     }
 
     ngOnInit() {
