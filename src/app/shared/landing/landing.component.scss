@@ -1,0 +1,22 @@
+@use "_variables" as *;
+
+.org-card {
+  background-color: $outerBorderColor;
+}
+
+a {
+  white-space: normal;
+}
+
+.srp-card {
+  background-color: $recAccentColor;
+}
+
+.pal-card {
+  background-color: $palAccentColor;
+}
+
+.sci-card {
+  background-color: $sciAccentColor;
+}
+

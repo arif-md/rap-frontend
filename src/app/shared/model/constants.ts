@@ -8,7 +8,7 @@ export const PATH_HOME = 'home';
 export const PATH_LOGIN = 'sign-in';
 export const PATH_HOME_SRP = 'home-srp';
 export const PATH_HELP = 'help';
-export const PATH_HOME_PALEO = 'home-pal';
+export const PATH_HOME_PAL = 'home-pal';
 export const PATH_HOME_GENSC = 'home-gensc';
 export const PATH_DASHBOARD = 'dashboard';
 export const PATH_ADMIN_APP = 'admin-applicant';
@@ -20,6 +20,26 @@ export const PATH_SCI = 'sci';
 export const PATH_LOGOUT_SUCCESS = 'logout-success';
 export const PATH_LOGIN_FAILURE = 'login-failure';
 export const UNAUTHORIZED = 'unauthorized';
+export const PATH_DEFAULT = '';
+export const PATH_UNSPECIFIED = '**';
+
+// Path / Browser Tab Titles
+export const LANDING_TITLE = "Rap | Home";
+export const REC_TITLE = "Rap | Module-1";
+export const PAL_TITLE = "Rap | Module-2";
+export const SCI_TITLE = "Rap | Module-3";
+export const REC_HOME_TITLE = "Rap | Module-1 Home";
+export const PAL_HOME_TITLE = "Rap | Module-2 Home";
+export const SCI_HOME_TITLE = "Rap | Module-3 Home";
+export const HELP_TITLE = "Rap | Help";
+export const LOGIN_TITLE = "Rap | Login";
+export const LOGOUT_TITLE = "Rap | Logout Successful";
+export const LOGIN_FAILURE_TITLE = "Rap | Login Failed";
+export const DASHBOARD_TITLE = "Rap | Dashboard";
+export const ADMIN_TITLE = "Rap | Admin";
+export const MANAGE_ACCOUNT_TITLE = "Rap | Manage Account";
+export const UNAUTHORIZED_TITLE = "Rap | Unauthorized";
+
 
 // All server side URL's
 export const URL_EXTEND_SESSION = 'api/session/extendSession';

@@ -1,0 +1,62 @@
+<div class="bg-org-topo">
+    <div class="container">
+        <div class="row pt-5">
+            <div class="col">
+                <div class="card org-card">
+                    <div class="card-body">
+                        <p>Welcome to <b>RAP</b>.
+                            This is the site for prototyping Azure Containerized Apps.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br><br>
+        <!-- (Card Deck) -->
+        <div class="row pb-5">
+            <div class="card-group">
+                <!--1st Card SRP-->
+                <div class="card srp-card">
+                    <a [routerLink]="['/home-srp']">
+                        <img src="assets/img/forest.jpg" alt="Module-1" class="card-img-top"/>
+                    </a>
+                    <div class="card-body">
+                        <h4 class="card-title text-center">Module - 1</h4>
+                        <p class="card-text">blah blah blah...
+                        </p>
+                    </div>
+                    <div class="card-footer text-center">
+                        <a title="Home Module-1" class="btn btn-dark" [routerLink]="['/home-srp']">Module-1 Home Page</a>
+                    </div>
+                </div>
+                <!--2nd Card Pal-->
+                <div class="card pal-card">
+                    <a title="Home Module-2" [routerLink]="['/home-pal']">
+                        <img src="assets/img/beach.jpg" alt="Module-2" class="card-img-top"/>
+                    </a>
+                    <div class="card-body">
+                        <h4 class="card-title text-center">Module-2</h4>
+                        <p class="card-text">blah blah blah.</p>
+                    </div>
+                    <div class="card-footer text-center">
+                        <a title="Home Module-2" class="btn btn-dark" [routerLink]="['/home-pal']">Module-2 Home Page</a>
+                    </div>
+                </div>
+                <!--3rd Card Sci-->
+                <div class="card sci-card">
+                    <a title="Home Module-3" [routerLink]="['/home-gensc']">
+                        <img src="assets/img/mountain.jpg" alt="Module-3" class="card-img-top"/>
+                    </a>
+                    <div class="card-body">
+                        <h4 class="card-title text-center">Module-3</h4>
+                        <p class="card-text">blah blah blah.
+                        </p>
+                    </div>
+                    <div class="card-footer text-center">
+                        <a title="Home Module-3" class="btn btn-dark" [routerLink]="['/home-gensc']">Module-3 Home Page</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
