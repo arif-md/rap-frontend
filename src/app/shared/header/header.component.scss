@@ -1,7 +1,76 @@
-header {
-  background: var(--red-to-pink-to-purple-horizontal-gradient, #f06);
-  color: white;
-  padding: 1rem;
-  text-align: center;
-  font-size: 1.5rem;
+@use "../../../variables" as *;
+
+.rap-rec-mid-header {
+    content: "";
+    background-color: $recAccentColor;
+    height: 2px;
+}
+
+.rap-generic-mid-header {
+  content: "";
+  background-color: #F4DEA6;
+  height: 2px;
+}
+
+.rap-generic-bottom-header {
+  content: "";
+  background-color: #F4DEA6;
+  height: 2px;
+}
+
+.rap-rec-bottom-header {
+    content: "";
+    background-color: $recAccentColor;
+    height: 2px;
+    border-width: 0;
+}
+
+.rap-pal-mid-header {
+    content: "";
+    background-color: $palAccentColor;
+    height: 2px;
+}
+
+.rap-pal-bottom-header {
+    content: "";
+    background-color: $palAccentColor;
+    height: 2px;
+    border-width: 0px;
+}
+
+.rap-sci-mid-header {
+    content: "";
+    background-color: $sciAccentColor;
+    height: 2px;
+}
+
+.rap-sci-bottom-header {
+    content: "";
+    background-color: $sciAccentColor;
+    height: 2px;
+    border-width: 0;
+}
+
+.committed-code {
+	color: white;
+	vertical-align:center;
+}
+
+.uncommitted-code {
+	color: red;
+	vertical-align:center;
+}
+
+a:visited, a:link, a:hover {
+    color: #fff;
+    text-decoration: none;
+}
+
+.navbar-nav  li a:hover {
+    color: #1abc9c !important;
+}
+.navbar-text {
+    color: white;
+    padding: 10px;
+    font-size: xx-small;
 }

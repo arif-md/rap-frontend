@@ -12,9 +12,9 @@ $formGroupLabelColor: #fff;
 $white: white;
 $formBodyColor: $white;
 $recOrange: rgb(255, 147, 27);
-$paleoAccentColor: rgba(13, 124, 165, 1);
+$palAccentColor: rgba(13, 124, 165, 1);
 $sciAccentColor: #9FCF6E;
-$sharedAccentColor: $paleoAccentColor;
+$sharedAccentColor: $palAccentColor;
 $khakiBtnColor: rgba(240, 230, 140, 0.8);
 $confirmBlueColor: rgba(0, 105, 217, 1);
 $successColor: $confirmBlueColor;
@@ -26,11 +26,11 @@ $secondaryButtonColor: rgba(108, 117, 125, 1);
 $linkColor: #007bff;
 $linkHoverColor: #0056b3;
 
-$scienceLinkColor: $linkColor;
-$scienceHoverLinkColor: $linkHoverColor;
+$sciLinkColor: $linkColor;
+$sciHoverLinkColor: $linkHoverColor;
 
-$paleoLinkColor: $linkColor;
-$paleoHoverLinkColor: $linkHoverColor;
+$palLinkColor: $linkColor;
+$palHoverLinkColor: $linkHoverColor;
 
 $recAccentColor: rgba($recOrange, 1);
 

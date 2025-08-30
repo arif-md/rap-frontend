@@ -1,3 +1,27 @@
-<header>
-  <h1>Header Component</h1>
-</header>
+<div class="bg-org-topo">
+    <div class="container-fluid">
+        <div class="row py-2">
+            <div class="col-sm-11 d-none d-sm-block">
+                <a href="https://www.google.com" target="_blank">
+                    <img title="My Org Home" alt="My Org Home" class="float-start" height="80" src="assets/img/my_logo.svg"/>
+                </a>
+                <a title="Home" rel="home" [routerLink]="['/landing']">
+                    <h2 class="text-center">RAP Prototype Project</h2>
+                </a>
+            </div>
+            <div class="col-sm-11 d-block d-sm-none">
+                <a href="https://www.google.com" target="_blank">
+                    <img title="My Org Home" height="40" class="float-start" src="assets/img/my_logo.svg"/>
+                </a>
+                <a title="Home" rel="home" [routerLink]="['/landing']">
+                    <h4 class="text-center">RAP</h4>
+                </a>
+            </div>
+            <div class="col-sm-1"><h6 class="float-end" [ngClass]="dirty === true ? 'uncommitted-code' : 'committed-code'">Version# {{ appVersion }}</h6></div>
+        </div>
+
+        <div class="row justify-content-center m-0 text-center">
+            <div class="col"><h4 style="color:red">{{ envName }}</h4></div>
+        </div>
+    </div>
+</div>
