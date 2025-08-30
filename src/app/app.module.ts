@@ -1,23 +1,21 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { RouterModule, Routes } from '@angular/router';
+import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app';
 import { SharedModule } from './shared/shared.module';
 
-const routes: Routes = [
-  // Add your routes here, e.g. { path: 'home', component: HomeComponent }
-];
+
 
 @NgModule({
   declarations: [
   ],
   imports: [
     BrowserModule,
-    RouterModule.forRoot(routes),
+    AppRoutingModule,
     SharedModule,
     AppComponent,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  //bootstrap: [AppComponent]. This is not needed with bootstrapApplication in main.ts and also since AppComponent is a standalone component.
 })
 export class AppModule {}
