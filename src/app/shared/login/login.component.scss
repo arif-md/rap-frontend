@@ -1,0 +1,26 @@
+@use "_variables" as *;
+
+.conditionalBorder {
+	border: 1px solid white;
+	padding: 10px;
+  background-color: rgba(0,0,0, 0.5);
+}
+
+hr {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border: 0;
+    border-top: 1px solid #F4DEA6;
+}
+
+a:link,
+a:visited,
+a:hover,
+a:active {
+	text-color: white;
+	text-decorator: none;
+}
+.login-button {
+  min-height: 4em;
+  white-space: normal !important;
+}

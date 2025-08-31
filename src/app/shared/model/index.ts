@@ -3,3 +3,4 @@ export * from './constants';
 export * from './error-response';
 export * from './api-validation-error';
 export * from './api-error';
+export * from './environment-props';

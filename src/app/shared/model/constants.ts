@@ -2,6 +2,12 @@ export const MODULE_REC: string = 'SRP';
 export const MODULE_PAL: string = 'PAL';
 export const MODULE_SCI: string = 'SCI';
 
+export const ENV_LOCAL = 'Local';
+export const ENV_DEV = 'Development';
+export const ENV_TEST = 'Test';
+export const ENV_TRAIN = 'Training';
+
+
 // All client side URL's.
 export const PATH_LANDING = 'landing';
 export const PATH_HOME = 'home';
@@ -47,6 +53,7 @@ export const URL_AUTHENTICATE = 'api/auth/login';
 export const URL_LOGOUT = 'api/auth/logout';
 export const URL_AUTH_TOKEN = 'api/auth/token';
 export const URL_CSRF_TOKEN = 'api/auth/csrf';
+export const URL_CONFIG_ENV_PROPS = 'api/config/environmentProperties';
 
 // confirm dialog
 export const CONFIRM_DEFAULT_CANCEL_TEXT = 'Cancel';

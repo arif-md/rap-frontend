@@ -4,7 +4,7 @@ import { User } from '@app/shared/model/admin';
 import { ApplicationService } from '@app/global-services';
 import { NgClass } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
 import { MODULE_PAL, MODULE_REC, MODULE_SCI, PATH_LOGIN } from '@app/shared/model';
 
 @Component({
@@ -16,7 +16,7 @@ import { MODULE_PAL, MODULE_REC, MODULE_SCI, PATH_LOGIN } from '@app/shared/mode
         NgClass,
         RouterLink,
         RouterLinkActive,
-        NgbCollapse
+    NgbCollapseModule
     ]
 })
 export class HeaderComponent implements OnInit, OnDestroy {

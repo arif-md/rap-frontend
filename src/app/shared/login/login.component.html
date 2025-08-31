@@ -1,0 +1,44 @@
+<div class="bg-org-topo" style="min-height: 60vmin;">
+    <div class="container">
+        <br>
+        <div class="card my-3">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col">
+                        <h3>Login</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="d-grid gap-2 col-lg-6 col-md-7 mx-auto">
+                        <button mat-button mat-raised-button color="success" type="button" class="login-button" (click)="openUrl(extUserLoginUrl, '_self')">
+                            Sign in or create an account with OIDC provider
+                        </button>
+                    </div>
+                </div>
+                <div class="row mb-3 justify-content-center">
+                    <div class="d-grid gap-2 col-lg-6 col-md-7 mx-auto">
+                        @if (showInternalLogin) {
+                            <button mat-button mat-raised-button color="complete" type="button" class="login-button" (click)="openUrl(internalLoginUrl, '_self')">
+                                Login to {{ envName }} as a Internal user
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col">
+                        <p>Applicants need a OIDC account to access RAPTOR. Click the button to sign in or create an account at OIDC provider. Once you have signed in with OIDC provider, you will be
+                            redirected back to RAPTOR.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

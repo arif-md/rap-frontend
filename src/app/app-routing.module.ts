@@ -1,9 +1,11 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { LandingComponent } from '@app/shared/landing/landing.component';
+import { LoginComponent } from '@app/shared/login/login.component';
 
 import {
     LANDING_TITLE,
+    LOGIN_TITLE,
     PATH_ADMIN_APP,
     PATH_ADMIN_CONSOLE,
     PATH_DASHBOARD,
@@ -32,7 +34,7 @@ export const routes: Routes = [
 
   { path: PATH_LANDING, title: LANDING_TITLE, component: LandingComponent, canActivate: [DefaultPathGuard] },
   { path: PATH_HOME, title: LANDING_TITLE, component: LandingComponent, canActivate: [DefaultPathGuard] },
-  //{ path: PATH_LOGIN, title: LOGIN_TITLE, component: LoginComponent, canActivate: [DefaultPathGuard] },
+  { path: PATH_LOGIN, title: LOGIN_TITLE, component: LoginComponent, canActivate: [DefaultPathGuard] },
   //{ path: PATH_LOGOUT_SUCCESS, title: LOGOUT_TITLE, component: LogoutSuccessComponent },
   //{ path: PATH_LOGIN_FAILURE, title: LOGIN_FAILURE_TITLE, component: LoginFailureComponent },
   //{ path: UNAUTHORIZED, title: UNAUTHORIZED_TITLE, component: UnauthorizedComponent },
@@ -43,7 +45,7 @@ export const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes,{preloadingStrategy: PreloadAllModules})],
   exports: [RouterModule]
 })
 export class AppRoutingModule {}
