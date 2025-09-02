@@ -36,6 +36,29 @@ ng build
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
+## Docker : Build, run and upload image to ACR
+
+To build and test the container image run:
+
+```bash
+docker build -t frontend .
+docker run -itd -p 4200:80 frontend OR docker run -p 4200:80 frontend
+docker tag frontend:latest ngraptortest.azurecr.io/raptor/frontend
+docker images
+docker push ngraptortest.azurecr.io/raptor/frontend
+```
+
+The above commands will build and run the image so that it can be tested locally @ http://localhost:4200
+Please make sure to start the Docker container before executing the above commands. 
+Use the following commands to upload the image to ACR.
+
+```bash
+az login
+az acr login --name ngraptortest
+docker push ngraptortest.azurecr.io/raptor/frontend
+az acr repository list --name ngraptortest --output table
+```
+
 ## Running unit tests
 
 To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
