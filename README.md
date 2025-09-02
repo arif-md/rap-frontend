@@ -49,7 +49,7 @@ docker push ngraptortest.azurecr.io/raptor/frontend
 ```
 
 The above commands will build and run the image so that it can be tested locally @ http://localhost:4200
-Please make sure to start the Docker container before executing the above commands. 
+Please make sure to start the Docker desktop before executing the above commands. 
 Use the following commands to upload the image to ACR.
 
 ```bash
