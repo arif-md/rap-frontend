@@ -76,6 +76,16 @@ jobs:
           echo "image=$IMAGE_BY_DIGEST" >> $GITHUB_OUTPUT
           echo "Built and pushed: $IMAGE_BY_DIGEST"
 
+      - name: Verify dispatch token for cross-repo
+        if: env.INFRA_REPO != github.repository
+        run: |
+          set -euo pipefail
+          if [ -z "${{ secrets.GH_PAT_REPO_DISPATCH }}" ]; then
+            echo "Missing secret GH_PAT_REPO_DISPATCH. Create a PAT with repo access to ${{ env.INFRA_REPO }} and add it to environment 'test' secrets." >&2
+            echo "Required scopes: repo (classic) OR fine-grained with access to the infra repo and Actions: Read+write." >&2
+            exit 1
+          fi
+
       - name: Dispatch to infra repo with image digest
         uses: peter-evans/repository-dispatch@v3
         with:
