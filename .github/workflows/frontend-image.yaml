@@ -19,7 +19,7 @@ env:
 jobs:
   build-push:
     runs-on: ubuntu-latest
-    environment: test
+    environment: dev
     timeout-minutes: 45
     concurrency:
       group: frontend-${{ github.ref }}
@@ -81,16 +81,26 @@ jobs:
         run: |
           set -euo pipefail
           if [ -z "${{ secrets.GH_PAT_REPO_DISPATCH }}" ]; then
-            echo "Missing secret GH_PAT_REPO_DISPATCH. Create a PAT with repo access to ${{ env.INFRA_REPO }} and add it to environment 'test' secrets." >&2
+            echo "Missing secret GH_PAT_REPO_DISPATCH. Create a PAT with repo access to ${{ env.INFRA_REPO }} and add it to environment 'dev' secrets." >&2
             echo "Required scopes: repo (classic) OR fine-grained with access to the infra repo and Actions: Read+write." >&2
             exit 1
-          fi
 
-      - name: Dispatch to infra repo with image digest
+      - name: Dispatch to infra repo with image digest (cross-repo)
+        if: env.INFRA_REPO != github.repository
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.GH_PAT_REPO_DISPATCH }}
           repository: ${{ env.INFRA_REPO }}
           event-type: frontend-image-pushed
+          client-payload: |
+            {"image": "${{ steps.digest.outputs.image }}"}
+
+      - name: Dispatch promotion to infra repo (cross-repo)
+        if: env.INFRA_REPO != github.repository
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GH_PAT_REPO_DISPATCH }}
+          repository: ${{ env.INFRA_REPO }}
+          event-type: frontend-image-promote
           client-payload: |
             {"image": "${{ steps.digest.outputs.image }}"}
