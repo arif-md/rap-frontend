@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { User } from '@app/shared/model/admin';
-import { ApplicationService } from '@app/global-services';
+import { ApplicationService, AppConfigService } from '@app/global-services';
 import { NgClass } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
@@ -21,6 +21,7 @@ import { MODULE_PAL, MODULE_REC, MODULE_SCI, PATH_LOGIN } from '@app/shared/mode
 })
 export class HeaderComponent implements OnInit, OnDestroy {
     private applicationService = inject(ApplicationService);
+    private appConfigService = inject(AppConfigService);
     currentUser: User | null;
     dirty: boolean;
     moduleSubscription!: Subscription;
@@ -36,6 +37,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     constructor() {
         this.dirty = false;
+        // Will be hydrated from AppConfigService (runtime-config.json); fallback to 'Local'
         this.envName = 'Local';
         this.appVersion = '0.0.1-SNAPSHOT';
         this.currentUser = null;
@@ -45,7 +47,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.module_pal = MODULE_PAL;
         this.module_sci = MODULE_SCI;
         this.module_rec = MODULE_REC;
-        this.moduleSubscription = this.applicationService.currentModule.subscribe(module => this.module = module);
+    this.moduleSubscription = this.applicationService.currentModule.subscribe((module: string) => this.module = module);
+        // Load runtime config and set envName
+        this.appConfigService.loadEnvProperties().subscribe((props: any) => {
+            if (props?.appEnvName) {
+                this.envName = props.appEnvName;
+            }
+            if (props?.buildVersion) {
+                this.appVersion = props.buildVersion;
+            }
+        });
     }
 
     ngOnDestroy() {

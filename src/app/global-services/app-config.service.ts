@@ -46,14 +46,17 @@ export class AppConfigService {
     }*/
 
     loadEnvProperties(): Observable<EnvironmentProps> {
-        // const http = this.injector.get(HttpClient);
-        const url = `${this.locationStrategy.getBaseHref()}${URL_CONFIG_ENV_PROPS}`;
-        return this.http.get<EnvironmentProps>(url, httpOptions)
+        // Prefer runtime configuration served as a static JSON, fallback to API endpoint if not present
+        const base = this.locationStrategy.getBaseHref();
+        const runtimeUrl = `${base}assets/runtime-config.json`;
+        const apiUrl = `${base}${URL_CONFIG_ENV_PROPS}`;
+
+        return this.http.get<EnvironmentProps>(runtimeUrl, httpOptions)
             .pipe(
+                catchError(() => this.http.get<EnvironmentProps>(apiUrl, httpOptions)),
                 tap(recvdProps => {
                     this.props = this.envPropsAdapter.restToForm(recvdProps);
                     this.envPropsSubject.next(this.props);
-                    //this.props = recvdProps;
                 }),
                 catchError(this.errorHandler)
             );
