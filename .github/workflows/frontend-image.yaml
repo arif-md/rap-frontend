@@ -98,7 +98,7 @@ jobs:
             {"image": "${{ steps.digest.outputs.image }}"}
 
       - name: Dispatch promotion to infra repo (cross-repo)
-        if: env.INFRA_REPO != github.repository
+        if: false # Promotion is now triggered after successful dev deploy from infra workflow
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.GH_PAT_REPO_DISPATCH }}
@@ -118,7 +118,7 @@ jobs:
             {"image": "${{ steps.digest.outputs.image }}"}
 
       - name: Dispatch promotion to infra repo (same-repo)
-        if: env.INFRA_REPO == github.repository
+        if: false # Promotion is now triggered after successful dev deploy from infra workflow
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ github.token }}
