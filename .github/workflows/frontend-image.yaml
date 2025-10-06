@@ -14,7 +14,8 @@ env:
   AZURE_ACR_NAME: ${{ vars.AZURE_ACR_NAME }}
   AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
   IMAGE_REPO: raptor/frontend-${{ vars.AZURE_ENV_NAME }}
-  INFRA_REPO: arif-md/rap-infra
+  # Default to dispatching into the same repository unless overridden via repo variables
+  INFRA_REPO: ${{ vars.INFRA_REPO || github.repository }}
 
 jobs:
   build-push:
@@ -101,6 +102,26 @@ jobs:
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.GH_PAT_REPO_DISPATCH }}
+          repository: ${{ env.INFRA_REPO }}
+          event-type: frontend-image-promote
+          client-payload: |
+            {"image": "${{ steps.digest.outputs.image }}"}
+
+      - name: Dispatch to infra repo with image digest (same-repo)
+        if: env.INFRA_REPO == github.repository
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ github.token }}
+          repository: ${{ env.INFRA_REPO }}
+          event-type: frontend-image-pushed
+          client-payload: |
+            {"image": "${{ steps.digest.outputs.image }}"}
+
+      - name: Dispatch promotion to infra repo (same-repo)
+        if: env.INFRA_REPO == github.repository
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ github.token }}
           repository: ${{ env.INFRA_REPO }}
           event-type: frontend-image-promote
           client-payload: |
