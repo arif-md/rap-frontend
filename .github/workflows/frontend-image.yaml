@@ -60,6 +60,10 @@ jobs:
           context: .
           push: true
           tags: ${{ env.AZURE_ACR_NAME }}.azurecr.io/${{ env.IMAGE_REPO }}:${{ steps.meta.outputs.tag }}
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=${{ github.repository }}
+            org.opencontainers.image.ref.name=${{ github.ref_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           provenance: false
