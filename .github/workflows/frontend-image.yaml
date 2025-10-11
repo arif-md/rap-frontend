@@ -95,7 +95,7 @@ jobs:
           repository: ${{ env.INFRA_REPO }}
           event-type: frontend-image-pushed
           client-payload: |
-            {"image": "${{ steps.digest.outputs.image }}"}
+            {"image": "${{ steps.digest.outputs.image }}", "sourceRepo": "${{ github.repository }}"}
 
       - name: Dispatch promotion to infra repo (cross-repo)
         if: false # Promotion is now triggered after successful dev deploy from infra workflow
@@ -115,7 +115,7 @@ jobs:
           repository: ${{ env.INFRA_REPO }}
           event-type: frontend-image-pushed
           client-payload: |
-            {"image": "${{ steps.digest.outputs.image }}"}
+            {"image": "${{ steps.digest.outputs.image }}", "sourceRepo": "${{ github.repository }}"}
 
       - name: Dispatch promotion to infra repo (same-repo)
         if: false # Promotion is now triggered after successful dev deploy from infra workflow
