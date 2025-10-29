@@ -74,3 +74,71 @@ a:visited, a:link, a:hover {
     padding: 10px;
     font-size: xx-small;
 }
+
+.version-display {
+    font-family: 'Courier New', monospace;
+    line-height: 1.3;
+}
+
+.version-label {
+    opacity: 0.7;
+}
+
+.version-number {
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.env-badge {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.env-prod {
+    background-color: #28a745;
+    color: white;
+}
+
+.env-staging {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.env-dev {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.env-local {
+    background-color: #6c757d;
+    color: white;
+}
+
+.env-unknown {
+    background-color: #dc3545;
+    color: white;
+}
+
+.dirty-indicator {
+    color: #ffd700;
+    font-weight: bold;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+    .version-display {
+        font-size: 0.8rem;
+    }
+    .env-badge {
+        font-size: 0.6rem;
+        padding: 1px 4px;
+    }
+}

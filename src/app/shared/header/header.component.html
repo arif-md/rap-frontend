@@ -17,7 +17,21 @@
                     <h4 class="text-center">RAP</h4>
                 </a>
             </div>
-            <div class="col-sm-1"><h6 class="float-end" [ngClass]="dirty === true ? 'uncommitted-code' : 'committed-code'">Version# {{ appVersion }}</h6></div>
+            <div class="col-sm-1">
+                <div class="version-display text-end">
+                    <small class="version-label text-muted">v</small>
+                    <span class="version-number" 
+                          [ngClass]="{'uncommitted-code': isLocalDirtyBuild, 'committed-code': !isLocalDirtyBuild}" 
+                          [title]="versionTooltip">
+                        {{ appVersion }}
+                    </span>
+                    <br>
+                    <small class="env-badge" [ngClass]="getEnvBadgeClass()">
+                        {{ envName }}
+                        <span *ngIf="isLocalDirtyBuild" class="dirty-indicator">*</span>
+                    </small>
+                </div>
+            </div>
         </div>
 
         <div class="row justify-content-center m-0 text-center">

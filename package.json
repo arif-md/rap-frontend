@@ -3,10 +3,16 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start": "npm run set-version && ng serve",
+    "build": "npm run set-version && ng build",
+    "build:prod": "npm run set-version && ng build --configuration production",
+    "set-version": "node scripts/set-version.js",
+    "check-version": "node scripts/set-version.js && cat src/assets/runtime-config.json",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "docker:build": "npm run set-version && docker build -t frontend-local .",
+    "docker:run": "docker run -p 8080:80 frontend-local",
+    "local:build": "powershell -ExecutionPolicy Bypass -File scripts/local-build.ps1"
   },
   "prettier": {
     "overrides": [

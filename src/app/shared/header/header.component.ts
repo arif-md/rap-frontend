@@ -2,7 +2,7 @@ import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { User } from '@app/shared/model/admin';
 import { ApplicationService, AppConfigService } from '@app/global-services';
-import { NgClass } from '@angular/common';
+import { NgClass, NgIf } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
 import { MODULE_PAL, MODULE_REC, MODULE_SCI, PATH_LOGIN } from '@app/shared/model';
@@ -14,9 +14,10 @@ import { MODULE_PAL, MODULE_REC, MODULE_SCI, PATH_LOGIN } from '@app/shared/mode
   standalone: true,
     imports: [
         NgClass,
+        NgIf,
         RouterLink,
         RouterLinkActive,
-    NgbCollapseModule
+        NgbCollapseModule
     ]
 })
 export class HeaderComponent implements OnInit, OnDestroy {
@@ -47,7 +48,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.module_pal = MODULE_PAL;
         this.module_sci = MODULE_SCI;
         this.module_rec = MODULE_REC;
-    this.moduleSubscription = this.applicationService.currentModule.subscribe((module: string) => this.module = module);
+        this.moduleSubscription = this.applicationService.currentModule.subscribe((module: string) => this.module = module);
         // Load runtime config and set envName
         this.appConfigService.loadEnvProperties().subscribe((props: any) => {
             if (props?.appEnvName) {
@@ -57,6 +58,24 @@ export class HeaderComponent implements OnInit, OnDestroy {
                 this.appVersion = props.buildVersion;
             }
         });
+    }
+
+    getEnvBadgeClass(): string {
+        const env = this.envName.toLowerCase();
+        if (env.includes('prod')) return 'env-prod';
+        if (env.includes('staging') || env.includes('stage')) return 'env-staging';
+        if (env.includes('dev')) return 'env-dev';
+        if (env.includes('local')) return 'env-local';
+        return 'env-unknown';
+    }
+
+    // Check if this is a dirty local build
+    get isLocalDirtyBuild(): boolean {
+        return this.appVersion.includes('-dirty');
+    }
+
+    get versionTooltip(): string {
+        return `Version: ${this.appVersion}\nEnvironment: ${this.envName}${this.isLocalDirtyBuild ? '\n⚠️ Uncommitted changes' : ''}`;
     }
 
     ngOnDestroy() {

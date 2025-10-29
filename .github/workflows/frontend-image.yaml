@@ -32,6 +32,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Generate version info
+        run: |
+          npm install
+          node scripts/set-version.js
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
+
       - name: Azure Login (OIDC)
         uses: azure/login@v2
         with:
