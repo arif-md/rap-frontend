@@ -10,7 +10,7 @@
     "check-version": "node scripts/set-version.js && cat src/assets/runtime-config.json",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "docker:build": "npm run set-version && docker build -t frontend-local .",
+    "docker:build": "npm run set-version && node scripts/docker-build-local.js",
     "docker:run": "docker run -p 8080:80 frontend-local",
     "local:build": "powershell -ExecutionPolicy Bypass -File scripts/local-build.ps1"
   },

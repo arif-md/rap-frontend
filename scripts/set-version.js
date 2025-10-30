@@ -27,60 +27,89 @@ function getGitInfo() {
   }
 }
 
-// Get version from package.json and git info
-const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-const buildDate = new Date().toISOString();
-const isCI = !!process.env.CI || !!process.env.GITHUB_ACTIONS;
+// Detect if running in CI/CD environment
+function isCI() {
+  return !!(process.env.CI || process.env.GITHUB_ACTIONS);
+}
 
-let gitInfo, envName, buildVersion;
+// Get git information based on environment
+function getEnvironmentGitInfo() {
+  if (isCI()) {
+    // CI/CD environment - use environment variables
+    const sha = process.env.GITHUB_SHA || 'unknown';
+    return {
+      sha: sha,
+      ref: process.env.GITHUB_REF_NAME || 'main',
+      isDirty: false, // CI builds are always clean
+      shortSha: sha !== 'unknown' ? sha.substring(0, 8) : 'unknown'
+    };
+  } else {
+    // Local development - use git commands
+    return getGitInfo();
+  }
+}
 
-if (isCI) {
-  // CI/CD environment (GitHub Actions)
-  gitInfo = {
-    sha: process.env.GITHUB_SHA,
-    ref: process.env.GITHUB_REF_NAME || 'main',
-    isDirty: false,
-    shortSha: process.env.GITHUB_SHA ? process.env.GITHUB_SHA.substring(0, 8) : 'unknown'
+// Generate build version string
+function generateBuildVersion(packageVersion, gitInfo, envType) {
+  const dirtyFlag = (envType === 'local' && gitInfo.isDirty) ? '-dirty' : '';
+  return `${packageVersion}-${gitInfo.shortSha}${dirtyFlag}`;
+}
+
+// Main execution
+function main() {
+  // Get version from package.json
+  const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+  const buildDate = new Date().toISOString();
+  const ciEnvironment = isCI();
+  
+  // Get git information
+  const gitInfo = getEnvironmentGitInfo();
+  
+  // Determine environment name
+  const envName = ciEnvironment ? (process.env.AZURE_ENV_NAME || 'ci') : 'local';
+  
+  // Generate build version
+  const buildVersion = generateBuildVersion(packageJson.version, gitInfo, envName);
+  
+  // Create comprehensive version info
+  const versionInfo = {
+    version: packageJson.version,
+    buildVersion: buildVersion,
+    gitSha: gitInfo.sha,
+    gitRef: gitInfo.ref,
+    shortSha: gitInfo.shortSha,
+    isDirty: gitInfo.isDirty,
+    buildDate: buildDate,
+    buildTimestamp: Date.now(),
+    appEnvName: envName,
+    isCI: ciEnvironment,
+    buildType: ciEnvironment ? 'ci' : 'local'
   };
-  envName = process.env.AZURE_ENV_NAME || 'ci';
-  buildVersion = `${packageJson.version}-${gitInfo.shortSha}`;
-} else {
-  // Local development environment
-  gitInfo = getGitInfo();
-  envName = 'local';
-  const dirtyFlag = gitInfo.isDirty ? '-dirty' : '';
-  buildVersion = `${packageJson.version}-${gitInfo.shortSha}${dirtyFlag}`;
+
+  // Ensure assets directory exists
+  const assetsDir = path.join(__dirname, '..', 'src', 'assets');
+  if (!fs.existsSync(assetsDir)) {
+    fs.mkdirSync(assetsDir, { recursive: true });
+  }
+
+  // Write version info to assets
+  fs.writeFileSync(
+    path.join(assetsDir, 'runtime-config.json'),
+    JSON.stringify(versionInfo, null, 2)
+  );
+
+  // Log summary
+  console.log('Version info written:', {
+    buildVersion: versionInfo.buildVersion,
+    environment: versionInfo.appEnvName,
+    buildType: versionInfo.buildType,
+    isDirty: versionInfo.isDirty
+  });
 }
 
-// Create comprehensive version info
-const versionInfo = {
-  version: packageJson.version,
-  buildVersion: buildVersion,
-  gitSha: gitInfo.sha,
-  gitRef: gitInfo.ref,
-  shortSha: gitInfo.shortSha,
-  isDirty: gitInfo.isDirty,
-  buildDate: buildDate,
-  buildTimestamp: Date.now(),
-  appEnvName: envName,
-  isCI: isCI,
-  buildType: isCI ? 'ci' : 'local'
-};
-
-// Write to assets for runtime access
-const assetsDir = path.join(__dirname, '..', 'src', 'assets');
-if (!fs.existsSync(assetsDir)) {
-  fs.mkdirSync(assetsDir, { recursive: true });
+// Execute if called directly
+if (require.main === module) {
+  main();
 }
 
-fs.writeFileSync(
-  path.join(assetsDir, 'runtime-config.json'),
-  JSON.stringify(versionInfo, null, 2)
-);
-
-console.log('Version info written:', {
-  buildVersion: versionInfo.buildVersion,
-  environment: versionInfo.appEnvName,
-  buildType: versionInfo.buildType,
-  isDirty: versionInfo.isDirty
-});
+module.exports = { main, getGitInfo, isCI, generateBuildVersion };

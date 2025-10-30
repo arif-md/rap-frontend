@@ -7,6 +7,15 @@ export class EnvironmentProps {
     tcsAppId?: string;
     reportsUrl?: string;
     buildVersion?: string;
+    version?: string;
+    gitSha?: string;
+    gitRef?: string;
+    shortSha?: string;
+    buildDate?: string;
+    buildTimestamp?: number;
+    isDirty?: boolean;
+    isCI?: boolean;
+    buildType?: string;
     //gisAppUrl? : string;
     dirty?: boolean;
     sciMapApiKey: string;
@@ -25,7 +34,16 @@ export class EnvironmentPropsAdapter implements Rest2Form<EnvironmentProps> {
         result.tcsAppId = item.tcsAppId;
         result.reportsUrl = item.reportsUrl;
         result.buildVersion = item.buildVersion;
-        result.dirty = item.dirty;
+        result.version = item.version;
+        result.gitSha = item.gitSha;
+        result.gitRef = item.gitRef;
+        result.shortSha = item.shortSha;
+        result.buildDate = item.buildDate;
+        result.buildTimestamp = item.buildTimestamp;
+        result.isDirty = item.isDirty;
+        result.isCI = item.isCI;
+        result.buildType = item.buildType;
+        result.dirty = item.dirty || item.isDirty; // Support both for backward compatibility
         result.recMapApiKey = item.recMapApiKey;
         result.sciMapApiKey = item.sciMapApiKey;
         result.palMapApiKey = item.palMapApiKey;

@@ -24,7 +24,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private applicationService = inject(ApplicationService);
     private appConfigService = inject(AppConfigService);
     currentUser: User | null;
-    dirty: boolean;
     moduleSubscription!: Subscription;
     module!: string;
     module_rec!: string;
@@ -33,11 +32,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
     module_generic!: string;
     envName: string;
     appVersion: string;
+    isDirtyBuild: boolean = false;
     path_login: string = PATH_LOGIN;
     navbarCollapsed: boolean = true;
 
     constructor() {
-        this.dirty = false;
         // Will be hydrated from AppConfigService (runtime-config.json); fallback to 'Local'
         this.envName = 'Local';
         this.appVersion = '0.0.1-SNAPSHOT';
@@ -57,6 +56,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
             if (props?.buildVersion) {
                 this.appVersion = props.buildVersion;
             }
+            // Update dirty status from build info
+            this.isDirtyBuild = props?.isDirty || props?.dirty || this.appVersion.includes('-dirty');
         });
     }
 
@@ -71,7 +72,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     // Check if this is a dirty local build
     get isLocalDirtyBuild(): boolean {
-        return this.appVersion.includes('-dirty');
+        return this.isDirtyBuild;
     }
 
     get versionTooltip(): string {

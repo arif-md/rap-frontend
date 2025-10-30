@@ -35,13 +35,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
-      - name: Generate version info
+      - name: Install dependencies and generate version info
         run: |
-          npm install
-          node scripts/set-version.js
+          npm ci
+          npm run set-version
         env:
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_REF_NAME: ${{ github.ref_name }}
@@ -59,11 +59,21 @@ jobs:
           set -euo pipefail
           az acr login -n "$AZURE_ACR_NAME"
 
-      - name: Set image tag
+      - name: Set image tag and version
         id: meta
         run: |
           set -euo pipefail
           echo "tag=${GITHUB_SHA::12}" >> $GITHUB_OUTPUT
+          
+          # Extract build version from generated runtime config
+          if [ -f "src/assets/runtime-config.json" ]; then
+            BUILD_VERSION=$(cat src/assets/runtime-config.json | grep '"buildVersion"' | cut -d'"' -f4)
+            echo "app_version=$BUILD_VERSION" >> $GITHUB_OUTPUT
+            echo "Using build version: $BUILD_VERSION"
+          else
+            echo "app_version=unknown" >> $GITHUB_OUTPUT
+            echo "Warning: No runtime config found"
+          fi
 
       - name: Docker Buildx setup
         uses: docker/setup-buildx-action@v3
@@ -75,10 +85,13 @@ jobs:
           context: .
           push: true
           tags: ${{ env.AZURE_ACR_NAME }}.azurecr.io/${{ env.IMAGE_REPO }}:${{ steps.meta.outputs.tag }}
+          build-args: |
+            APP_VERSION=${{ steps.meta.outputs.app_version }}
           labels: |
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.source=${{ github.repository }}
             org.opencontainers.image.ref.name=${{ github.ref_name }}
+            org.opencontainers.image.version=${{ steps.meta.outputs.app_version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           provenance: false
