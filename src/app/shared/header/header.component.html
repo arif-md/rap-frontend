@@ -24,18 +24,19 @@
                           [ngClass]="{'uncommitted-code': isLocalDirtyBuild, 'committed-code': !isLocalDirtyBuild}" 
                           [title]="versionTooltip">
                         {{ appVersion }}
-                    </span>
-                    <br>
-                    <small class="env-badge" [ngClass]="getEnvBadgeClass()">
-                        {{ envName }}
                         <span *ngIf="isLocalDirtyBuild" class="dirty-indicator">*</span>
-                    </small>
+                    </span>
                 </div>
             </div>
         </div>
 
         <div class="row justify-content-center m-0 text-center">
-            <div class="col"><h4 style="color:red">{{ envName }}</h4></div>
+            <div class="col">
+                <span class="env-badge-center" [ngClass]="getEnvBadgeClass()">
+                    {{ envName }}
+                    <span *ngIf="isLocalDirtyBuild" class="dirty-indicator">*</span>
+                </span>
+            </div>
         </div>
     </div>
 </div>

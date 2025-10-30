@@ -96,6 +96,17 @@ a:visited, a:link, a:hover {
     font-weight: 500;
 }
 
+.env-badge-center {
+    font-size: 1.2rem;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 4px 0;
+}
+
 .env-prod {
     background-color: #28a745;
     color: white;
@@ -107,7 +118,7 @@ a:visited, a:link, a:hover {
 }
 
 .env-dev {
-    background-color: #17a2b8;
+    background-color: #dc3545; // Red color like in your image
     color: white;
 }
 
