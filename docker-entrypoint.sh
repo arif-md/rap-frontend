@@ -21,6 +21,7 @@ else
   "appEnv": "${AZURE_ENV_NAME:-local}",
   "appEnvName": "${AZURE_ENV_NAME:-Local}",
   "buildVersion": "${APP_VERSION:-0.0.1-SNAPSHOT}",
+  "apiBaseUrl": "${API_BASE_URL:-http://localhost:8080}",
   "_runtimeGenerated": true,
   "_generatedAt": "$(date -Iseconds)",
   "_fallbackMode": true

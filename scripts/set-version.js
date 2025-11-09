@@ -83,7 +83,8 @@ function main() {
     buildTimestamp: Date.now(),
     appEnvName: envName,
     isCI: ciEnvironment,
-    buildType: ciEnvironment ? 'ci' : 'local'
+    buildType: ciEnvironment ? 'ci' : 'local',
+    apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:8080'
   };
 
   // Ensure assets directory exists

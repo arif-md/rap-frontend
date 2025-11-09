@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { User } from '@app/shared/model/admin';
-import { ApplicationService, AppConfigService } from '@app/global-services';
+import { ApplicationService, AppConfigService, AuthenticationService } from '@app/global-services';
 import { NgClass, NgIf } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
@@ -23,7 +23,10 @@ import { MODULE_PAL, MODULE_REC, MODULE_SCI, PATH_LOGIN } from '@app/shared/mode
 export class HeaderComponent implements OnInit, OnDestroy {
     private applicationService = inject(ApplicationService);
     private appConfigService = inject(AppConfigService);
+    private authService = inject(AuthenticationService);
+    
     currentUser: User | null;
+    currentUserSubscription!: Subscription;
     moduleSubscription!: Subscription;
     module!: string;
     module_rec!: string;
@@ -48,6 +51,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.module_sci = MODULE_SCI;
         this.module_rec = MODULE_REC;
         this.moduleSubscription = this.applicationService.currentModule.subscribe((module: string) => this.module = module);
+        
+        // Subscribe to current user
+        this.currentUserSubscription = this.authService.currentUser.subscribe(
+            user => this.currentUser = user
+        );
+        
         // Load runtime config and set envName
         this.appConfigService.loadEnvProperties().subscribe((props: any) => {
             if (props?.appEnvName) {
@@ -59,6 +68,32 @@ export class HeaderComponent implements OnInit, OnDestroy {
             // Update dirty status from build info
             this.isDirtyBuild = props?.isDirty || props?.dirty || this.appVersion.includes('-dirty');
         });
+    }
+
+    /**
+     * Logout user
+     */
+    async logout(): Promise<void> {
+        await this.authService.logout();
+    }
+
+    /**
+     * Check if user is admin
+     */
+    get isAdmin(): boolean {
+        return this.authService.isAdmin();
+    }
+
+    /**
+     * Get user display name
+     */
+    get userDisplayName(): string {
+        if (this.currentUser) {
+            return this.currentUser.firstName && this.currentUser.lastName
+                ? `${this.currentUser.firstName} ${this.currentUser.lastName}`
+                : this.currentUser.email || 'User';
+        }
+        return '';
     }
 
     getEnvBadgeClass(): string {
@@ -81,9 +116,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         // unsubscribe to ensure no memory leaks.
-        //this.currentUserSubscription.unsubscribe();
-        //this.envPropsSubscription.unsubscribe();
-        this.moduleSubscription.unsubscribe();
+        if (this.currentUserSubscription) {
+            this.currentUserSubscription.unsubscribe();
+        }
+        if (this.moduleSubscription) {
+            this.moduleSubscription.unsubscribe();
+        }
     }
 
 }

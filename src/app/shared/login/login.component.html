@@ -5,26 +5,43 @@
             <div class="card-header">
                 <div class="row">
                     <div class="col">
-                        <h3>Login</h3>
+                        <h3>Login to RAPTOR</h3>
                     </div>
                 </div>
             </div>
 
             <div class="card-body">
+                @if (sessionExpired) {
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Your session has expired. Please log in again.
+                    </div>
+                }
+
+                @if (errorMessage) {
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-x-circle-fill me-2"></i>
+                        {{ errorMessage }}
+                    </div>
+                }
+
                 <div class="row mb-3">
                     <div class="d-grid gap-2 col-lg-6 col-md-7 mx-auto">
-                        <button mat-button mat-raised-button color="success" type="button" class="login-button" (click)="openUrl(extUserLoginUrl, '_self')">
-                            Sign in or create an account with OIDC provider
+                        <button 
+                            mat-raised-button 
+                            color="primary" 
+                            type="button" 
+                            class="login-button"
+                            (click)="login()"
+                            [disabled]="isLoading">
+                            @if (isLoading) {
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Redirecting to OIDC Provider...
+                            } @else {
+                                <i class="bi bi-box-arrow-in-right me-2"></i>
+                                Sign in with OIDC Provider
+                            }
                         </button>
-                    </div>
-                </div>
-                <div class="row mb-3 justify-content-center">
-                    <div class="d-grid gap-2 col-lg-6 col-md-7 mx-auto">
-                        @if (showInternalLogin) {
-                            <button mat-button mat-raised-button color="complete" type="button" class="login-button" (click)="openUrl(internalLoginUrl, '_self')">
-                                Login to {{ envName }} as a Internal user
-                            </button>
-                        }
                     </div>
                 </div>
             </div>
@@ -32,13 +49,17 @@
             <div class="card-footer">
                 <div class="row">
                     <div class="col">
-                        <p>Applicants need a OIDC account to access RAPTOR. Click the button to sign in or create an account at OIDC provider. Once you have signed in with OIDC provider, you will be
-                            redirected back to RAPTOR.
+                        <p class="mb-2">
+                            <i class="bi bi-info-circle me-2"></i>
+                            You need an OIDC account to access RAPTOR.
+                        </p>
+                        <p class="mb-0 text-muted small">
+                            Click the button above to sign in or create an account with your OIDC provider. 
+                            Once authenticated, you will be redirected back to RAPTOR.
                         </p>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>

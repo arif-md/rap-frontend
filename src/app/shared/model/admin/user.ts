@@ -3,24 +3,30 @@ import { Injectable } from '@angular/core';
 import { Rest2Form } from '@app/shared/model/base';
 
 export class User extends BaseModel {
-    id!: number;
+    id?: number | string; // Can be number (legacy) or string (OIDC subject)
     email!: string;
     password?: string;
     newPassword?: string;
     firstName!: string;
     middleInitial?: string;
     lastName?: string;
-    phone!: string;
-    orcId!: string;
+    fullName?: string; // OIDC full name
+    phone?: string;
+    orcId?: string;
     isExternalUser!: boolean;
     passwordResetToken?: string;
-    rapAdmin!: boolean;
-    loginRole!: string;
-    loginRoleDesc!: string;
-    loginRoleAssocId!: number;
+    rapAdmin?: boolean;
+    loginRole?: string;
+    loginRoleDesc?: string;
+    loginRoleAssocId?: number;
     loginOfficeId?: number;
     loginOfficeName?: string;
     loginOfficeCd?: string;
+    // OIDC-specific fields
+    roles?: string[];
+    isActive?: boolean;
+    lastLoginAt?: string;
+    createdAt?: string;
 }
 
 @Injectable({
@@ -50,8 +56,13 @@ export class UserAdapter implements Rest2Form<User> {
         result.loginOfficeId = item.loginOfficeId;
         result.loginOfficeName = item.loginOfficeName;
         result.loginOfficeCd = item.loginOfficeCd;
-
         result.passwordResetToken = item.passwordResetToken;
+        
+        // OIDC-specific fields
+        result.roles = item.roles;
+        result.isActive = item.isActive;
+        result.lastLoginAt = item.lastLoginAt;
+
         return result;
     }
 

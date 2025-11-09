@@ -1,0 +1,23 @@
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-12">
+      <h1>Welcome to the Dashboard</h1>
+      
+      <div *ngIf="currentUser" class="card mt-4">
+        <div class="card-header">
+          <h5>User Information</h5>
+        </div>
+        <div class="card-body">
+          <p><strong>Email:</strong> {{ currentUser.email }}</p>
+          <p><strong>Full Name:</strong> {{ currentUser.fullName || 'Not provided' }}</p>
+          <p><strong>Roles:</strong> {{ currentUser.roles?.join(', ') || 'None' }}</p>
+        </div>
+      </div>
+
+      <div class="alert alert-info mt-4">
+        <h5>Dashboard Features</h5>
+        <p>This is your personalized dashboard. More features will be added here.</p>
+      </div>
+    </div>
+  </div>
+</div>

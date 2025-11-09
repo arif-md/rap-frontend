@@ -4,7 +4,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app';
 import { SharedModule } from './shared/shared.module';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { ErrorInterceptor} from '@app/interceptors';
+import { AuthInterceptor } from '@app/interceptors/auth-interceptor';
+import { ErrorInterceptor } from '@app/interceptors';
 
 
 @NgModule({
@@ -17,6 +18,9 @@ import { ErrorInterceptor} from '@app/interceptors';
     AppComponent,
   ],
   providers: [
+    // AuthInterceptor must run BEFORE ErrorInterceptor
+    // It handles 401 errors with token refresh
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
   ],
   //bootstrap: [AppComponent]. This is not needed with bootstrapApplication in main.ts and also since AppComponent is a standalone component.

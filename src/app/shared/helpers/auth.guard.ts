@@ -19,20 +19,24 @@ export class AuthGuard  {
             // authorised so return true
             return true;
         }
-    // See if the user is authenticated through SSO on server side.
-    return this.authenticationService.getAuthToken(0, 0, true).pipe(
-            map(res => {
-                if (res) {
-                    this.router.navigate([PATH_DASHBOARD]);
+        
+        // Check if user is authenticated on the backend (OIDC session)
+        return this.authenticationService.checkSession().pipe(
+            map(response => {
+                if (response.authenticated && response.user) {
+                    // User is authenticated via OIDC
                     return true;
                 } else {
+                    // Not authenticated, redirect to login
                     this.router.navigate([PATH_LOGIN], {queryParams: {returnUrl: state.url}});
                     return false;
                 }
             }),
             catchError(err => {
-                console.error(err);
+                console.error('Auth check failed:', err);
+                this.router.navigate([PATH_LOGIN], {queryParams: {returnUrl: state.url}});
                 return of(false);
-            }));
+            })
+        );
     }
 }

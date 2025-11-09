@@ -16,6 +16,7 @@ export class EnvironmentProps {
     isDirty?: boolean;
     isCI?: boolean;
     buildType?: string;
+    apiBaseUrl?: string;
     //gisAppUrl? : string;
     dirty?: boolean;
     sciMapApiKey: string;
@@ -43,6 +44,7 @@ export class EnvironmentPropsAdapter implements Rest2Form<EnvironmentProps> {
         result.isDirty = item.isDirty;
         result.isCI = item.isCI;
         result.buildType = item.buildType;
+        result.apiBaseUrl = item.apiBaseUrl;
         result.dirty = item.dirty || item.isDirty; // Support both for backward compatibility
         result.recMapApiKey = item.recMapApiKey;
         result.sciMapApiKey = item.sciMapApiKey;

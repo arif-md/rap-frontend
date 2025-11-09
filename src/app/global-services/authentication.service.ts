@@ -1,15 +1,37 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject, Observable, throwError, firstValueFrom } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { ErrorResponse, PATH_LOGIN, PATH_MANAGE_ACC, URL_AUTH_TOKEN, URL_AUTHENTICATE, URL_CSRF_TOKEN, URL_LOGOUT } from '@app/shared/model';
 import { User, UserAdapter } from '@app/shared/model/admin';
 import { LocationStrategy } from '@angular/common';
 import { Router } from '@angular/router';
+import { AppConfigService } from './app-config.service';
 
 const httpOptions = {
-  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+  withCredentials: true // Important for cookies
 };
+
+interface AuthUser {
+  id: string;
+  email: string;
+  fullName: string;
+  roles: string[];
+  oidcSubject: string;
+  isActive: boolean;
+  lastLoginAt: string;
+  createdAt: string;
+}
+
+interface LoginResponse {
+  authorizationUrl: string;
+}
+
+interface SessionCheckResponse {
+  authenticated: boolean;
+  requiresReauth: boolean;
+  user?: AuthUser;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {
@@ -17,14 +39,27 @@ export class AuthenticationService {
     private http = inject(HttpClient);
     private locationStrategy = inject(LocationStrategy);
     private adapter = inject(UserAdapter);
+    private appConfigService = inject(AppConfigService);
 
     private currentUserSubject: BehaviorSubject<User | null>;
     public currentUser: Observable<User | null>;
+    private sessionCheckInterval: any;
 
     constructor() {
         const storedUser = localStorage.getItem('currentUser');
         this.currentUserSubject = new BehaviorSubject<User | null>(storedUser ? JSON.parse(storedUser) : null);
         this.currentUser = this.currentUserSubject.asObservable();
+        
+        // Check session on initialization
+        this.checkSession().subscribe({
+            error: (err) => {
+                // Silently fail on initialization - user is just not authenticated
+                console.debug('Session check failed on initialization:', err);
+            }
+        });
+        
+        // Set up periodic session check (every 5 minutes)
+        this.setupSessionCheck();
     }
 
     public get currentUserValue(): User | null {
@@ -40,120 +75,216 @@ export class AuthenticationService {
         this.currentUserSubject.next(user);
     }
 
+    /**
+     * Get OIDC login URL from backend
+     */
+    getLoginUrl(): Observable<LoginResponse> {
+        const url = `${this.locationStrategy.getBaseHref()}auth/login`;
+        return this.http.get<LoginResponse>(url, httpOptions)
+            .pipe(catchError(this.errorHandler));
+    }
 
+    /**
+     * Redirect to OIDC provider for authentication
+     */
+    async redirectToLogin(): Promise<void> {
+        try {
+            const apiBaseUrl = this.appConfigService.envProperties?.apiBaseUrl || 'http://localhost:8080';
+            const response = await firstValueFrom(
+                this.http.get<{ authorizationUrl: string; message: string }>(`${apiBaseUrl}/auth/login`)
+            );
+            // Construct full URL - backend returns relative path
+            const backendBaseUrl = apiBaseUrl;
+            const authUrl = response.authorizationUrl.startsWith('http') 
+                ? response.authorizationUrl 
+                : backendBaseUrl + response.authorizationUrl;
+            window.location.href = authUrl;
+        } catch (error) {
+            console.error('Failed to get login URL:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get current authenticated user from backend
+     */
+    getCurrentUser(): Observable<AuthUser> {
+        const url = `${this.locationStrategy.getBaseHref()}auth/user`;
+        return this.http.get<AuthUser>(url, httpOptions)
+            .pipe(
+                tap(user => {
+                    if (user) {
+                        // Convert backend user to frontend User model
+                        const frontendUser = this.convertToFrontendUser(user);
+                        this.currentUserValue = frontendUser;
+                    }
+                }),
+                catchError(this.errorHandler)
+            );
+    }
+
+    /**
+     * Check session status (proactive check)
+     */
+    checkSession(): Observable<SessionCheckResponse> {
+        const url = `${this.locationStrategy.getBaseHref()}auth/check`;
+        return this.http.get<SessionCheckResponse>(url, httpOptions)
+            .pipe(
+                tap(response => {
+                    if (response.requiresReauth) {
+                        // Token expired, need to re-authenticate
+                        this.handleSessionExpiry();
+                    } else if (response.authenticated && response.user) {
+                        const frontendUser = this.convertToFrontendUser(response.user);
+                        this.currentUserValue = frontendUser;
+                    } else if (!response.authenticated) {
+                        this.clearUserDetails();
+                    }
+                }),
+                catchError(error => {
+                    if (error.status === 401) {
+                        this.clearUserDetails();
+                    }
+                    return throwError(() => error);
+                })
+            );
+    }
+
+    /**
+     * Setup periodic session check
+     */
+    private setupSessionCheck(): void {
+        // Check every 5 minutes
+        this.sessionCheckInterval = setInterval(() => {
+            this.checkSession().subscribe({
+                error: (err) => console.warn('Session check failed:', err)
+            });
+        }, 5 * 60 * 1000); // 5 minutes
+    }
+
+    /**
+     * Handle session expiry - redirect to login
+     */
+    private handleSessionExpiry(): void {
+        this.clearUserDetails();
+        this.router.navigate(['/login'], { 
+            queryParams: { 
+                returnUrl: this.router.url,
+                sessionExpired: true 
+            } 
+        });
+    }
+
+    /**
+     * Logout - revoke tokens and clear session
+     */
+    async logout(): Promise<void> {
+        const url = `${this.locationStrategy.getBaseHref()}auth/logout`;
+        try {
+            await firstValueFrom(
+                this.http.post<any>(url, {}, httpOptions)
+            );
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            await this.clearUserDetails();
+            this.router.navigate(['/login']);
+        }
+    }
+
+    /**
+     * Clear user details from local storage and state
+     */
+    async clearUserDetails(): Promise<void> {
+        localStorage.removeItem('currentUser');
+        this.currentUserSubject.next(null);
+    }
+
+    /**
+     * Convert backend AuthUser to frontend User model
+     */
+    private convertToFrontendUser(authUser: AuthUser): User {
+        return {
+            id: authUser.id,
+            email: authUser.email,
+            fullName: authUser.fullName,
+            firstName: authUser.fullName.split(' ')[0] || '',
+            lastName: authUser.fullName.split(' ').slice(1).join(' ') || '',
+            phone: '', // Not provided by OIDC
+            roles: authUser.roles,
+            rapAdmin: authUser.roles?.includes('ADMIN') || false,
+            isActive: authUser.isActive,
+            isExternalUser: true, // All OIDC users are external
+            lastLoginAt: authUser.lastLoginAt,
+            createdAt: authUser.createdAt
+        } as User;
+    }
+
+    /**
+     * Check if user has specific role
+     */
+    hasRole(role: string): boolean {
+        const user = this.currentUserValue;
+        return user?.roles?.includes(role) ?? false;
+    }
+
+    /**
+     * Check if user is admin
+     */
+    isAdmin(): boolean {
+        return this.hasRole('ADMIN');
+    }
+
+    /**
+     * Check if user is authenticated
+     */
+    isAuthenticated(): boolean {
+        return this.currentUserValue !== null;
+    }
+
+    /**
+     * Refresh access token (handled by backend via refresh token cookie)
+     */
+    refreshToken(): Observable<any> {
+        const url = `${this.locationStrategy.getBaseHref()}auth/refresh`;
+        return this.http.post<any>(url, {}, httpOptions)
+            .pipe(
+                tap(response => {
+                    if (response.requiresReauth) {
+                        // Backend requires OIDC re-authentication
+                        this.handleSessionExpiry();
+                    }
+                }),
+                catchError(error => {
+                    if (error.status === 401) {
+                        this.handleSessionExpiry();
+                    }
+                    return throwError(() => error);
+                })
+            );
+    }
+
+    /**
+     * Error handler
+     */
+    private errorHandler(error: any): Observable<never> {
+        const errorMessage = error.error?.message || error.message || 'Server Error';
+        return throwError(() => errorMessage);
+    }
+
+    /**
+     * Cleanup on service destroy
+     */
+    ngOnDestroy(): void {
+        if (this.sessionCheckInterval) {
+            clearInterval(this.sessionCheckInterval);
+        }
+    }
 
     verifyUserDetails(): void {
         const user = this.currentUserValue;
         if (user && user.isExternalUser && (!user.firstName || !user.lastName || !user.phone)) {
-            this.router.navigate([PATH_MANAGE_ACC]);
+            this.router.navigate(['/manage-account']);
         }
     }
-
-    /*login(loginReq: LoginRequest): Observable<User> {
-        const url = `${this.locationStrategy.getBaseHref()}${URL_AUTHENTICATE}`;
-        return this.http.post<User>(url, loginReq, httpOptions)
-            .pipe(
-                tap(user => {
-                    // login successful
-                    if (user) {
-                      // store user details in local storage.
-                      localStorage.setItem('currentUser', JSON.stringify(this.adapter.restToForm(user)));
-                      this.currentUserSubject.next(user);
-                      //return user;
-                    }
-                }),
-                catchError(this.errorHandler)
-                // catchError(this.handleError<any>('login'))
-            );
-    }*/
-
-    async getCsrfToken(): Promise<any> {
-      const url = `${this.locationStrategy.getBaseHref()}${URL_CSRF_TOKEN}`;
-      let token:any = await this.http.get<any>(url, {}).toPromise();
-      return token;
-    }
-
-    /*logout() {
-        // remove user from local storage to logout the user.
-        localStorage.removeItem('currentUser');
-    this.currentUserSubject.next(null);
-    }*/
-
-    async logout(isExternalUser: boolean): Promise<Observable<any>> {
-        //Send logout request to server inorder to invalidate the server side session and remove the session cookies(including csrf token).
-        const url: string = `${this.locationStrategy.getBaseHref()}${URL_LOGOUT}`;
-        return await this.http.post<any>(url, {withCredentials: true}).toPromise();
-            /*.then(res => {
-                console.debug('logout success')
-                return res;
-            }).catch(error => {
-                console.error('error in logout');
-                console.error(error);
-                // return false;
-            }).finally(() => {
-                this.clearUserDetails();
-            });*/
-    }
-
-    async clearUserDetails(): Promise<any> {
-        localStorage.removeItem('currentUser');
-        this.currentUserSubject.next(null);
-        //get a new csrf token from server so that the subsequent request doesn't fail.
-        const token = await this.getCsrfToken();
-        return token;
-    }
-
-    /*async verifyUser(loginReq: LoginRequest): Promise<boolean> {
-        const url = `${this.locationStrategy.getBaseHref()}${URL_VERIFY_USER}`;
-      try{
-        let result: boolean = await this.http.post<boolean>(url, loginReq, httpOptions).toPromise();
-        return result;
-      }catch (error){
-        await this.errorHandler(error);
-      }
-    }*/
-
-    getAuthToken(officeId: number, roleId: number, loginInfoNotFound?: boolean): Observable<User> {
-        const url = `${this.locationStrategy.getBaseHref()}${URL_AUTH_TOKEN}`;
-        let queryParams = new HttpParams();
-        if (officeId) {
-            queryParams = queryParams.append('officeId', officeId);
-        }
-        if (roleId) {
-            queryParams = queryParams.append('roleId', roleId);
-        }
-        if (loginInfoNotFound) {
-            queryParams = queryParams = queryParams.append('loginInfoNotFound', loginInfoNotFound + '');
-        }
-        return this.http.get<User>(url, {params: queryParams})
-            .pipe(
-                tap(user => {
-                    if (user) {
-                        const result = this.adapter.restToForm(user);
-                        if (result) {
-                            localStorage.setItem('currentUser', JSON.stringify(result));
-                            this.currentUserSubject.next(user);
-                        }
-                    } else {
-                        this.currentUserSubject.next(null);
-                    }
-                }),
-                catchError(this.errorHandler)
-            );
-    }
-
-    errorHandler(error: ErrorResponse) {
-        // This maybe should also call logout() and/or navigate to the login page
-        return throwError(error.message || 'Server Error');
-    }
-
-    /*private handleError<T> (operation = 'operation', result?: T) {
-       return (error: any): Observable<T> => {
-         // TODO: send the error to remote logging infrastructure
-         // Let the app keep running by returning an empty result.
-         // return of(error.message);
-         return Observable.throw(error.message || 'Server Error');
-       };
-    }*/
-
 }

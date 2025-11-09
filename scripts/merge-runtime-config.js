@@ -21,6 +21,7 @@ function mergeRuntimeConfig(outputPath) {
         appEnv: process.env.AZURE_ENV_NAME || 'local',
         appEnvName: process.env.AZURE_ENV_NAME || 'Local',
         buildVersion: process.env.APP_VERSION || '0.0.1-SNAPSHOT',
+        apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:8080',
         _runtimeGenerated: true,
         _generatedAt: new Date().toISOString()
     };
@@ -61,6 +62,7 @@ function mergeRuntimeConfig(outputPath) {
         console.log('[merge] Wrote runtime config to:', outputPath);
         console.log('[merge] Environment:', finalConfig.appEnvName);
         console.log('[merge] Build Version:', finalConfig.buildVersion);
+        console.log('[merge] API Base URL:', finalConfig.apiBaseUrl || 'not set');
         
         // Show git info if available
         if (finalConfig.gitSha) {
