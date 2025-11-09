@@ -1,6 +1,7 @@
 import { inject } from '@angular/core';
 import { Router, CanActivateFn, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { AuthenticationService } from '@app/global-services';
+import { PATH_LOGIN } from '@app/shared/model';
 
 export const authGuard: CanActivateFn = (
     route: ActivatedRouteSnapshot,
@@ -14,7 +15,7 @@ export const authGuard: CanActivateFn = (
     }
 
     // Not authenticated, redirect to login with return URL
-    router.navigate(['/login'], { 
+    router.navigate(['/' + PATH_LOGIN], { 
         queryParams: { returnUrl: state.url } 
     });
     return false;
@@ -33,7 +34,7 @@ export const adminGuard: CanActivateFn = (
 
     if (!authService.isAuthenticated()) {
         // Not authenticated, redirect to login
-        router.navigate(['/login'], { 
+        router.navigate(['/' + PATH_LOGIN], { 
             queryParams: { returnUrl: state.url } 
         });
     } else {

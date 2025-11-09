@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError, firstValueFrom } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { User, UserAdapter } from '@app/shared/model/admin';
+import { PATH_LOGIN } from '@app/shared/model';
 import { LocationStrategy } from '@angular/common';
 import { Router } from '@angular/router';
 import { AppConfigService } from './app-config.service';
@@ -167,7 +168,7 @@ export class AuthenticationService {
      */
     private handleSessionExpiry(): void {
         this.clearUserDetails();
-        this.router.navigate(['/login'], { 
+        this.router.navigate(['/' + PATH_LOGIN], { 
             queryParams: { 
                 returnUrl: this.router.url,
                 sessionExpired: true 
@@ -188,7 +189,7 @@ export class AuthenticationService {
             console.error('Logout error:', error);
         } finally {
             await this.clearUserDetails();
-            this.router.navigate(['/login']);
+            this.router.navigate(['/' + PATH_LOGIN]);
         }
     }
 
