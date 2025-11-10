@@ -20,6 +20,7 @@ interface AuthUser {
   roles: string[];
   oidcSubject: string;
   isActive: boolean;
+  isExternalUser: boolean;
   lastLoginAt: string;
   createdAt: string;
 }
@@ -80,7 +81,8 @@ export class AuthenticationService {
      * Get OIDC login URL from backend
      */
     getLoginUrl(): Observable<LoginResponse> {
-        const url = `${this.locationStrategy.getBaseHref()}auth/login`;
+        const apiBaseUrl = this.appConfigService.envProperties?.apiBaseUrl || 'http://localhost:8080';
+        const url = `${apiBaseUrl}/auth/login`;
         return this.http.get<LoginResponse>(url, httpOptions)
             .pipe(catchError(this.errorHandler));
     }
@@ -110,7 +112,8 @@ export class AuthenticationService {
      * Get current authenticated user from backend
      */
     getCurrentUser(): Observable<AuthUser> {
-        const url = `${this.locationStrategy.getBaseHref()}auth/user`;
+        const apiBaseUrl = this.appConfigService.envProperties?.apiBaseUrl || 'http://localhost:8080';
+        const url = `${apiBaseUrl}/auth/user`;
         return this.http.get<AuthUser>(url, httpOptions)
             .pipe(
                 tap(user => {
@@ -128,7 +131,8 @@ export class AuthenticationService {
      * Check session status (proactive check)
      */
     checkSession(): Observable<SessionCheckResponse> {
-        const url = `${this.locationStrategy.getBaseHref()}auth/check`;
+        const apiBaseUrl = this.appConfigService.envProperties?.apiBaseUrl || 'http://localhost:8080';
+        const url = `${apiBaseUrl}/auth/check`;
         return this.http.get<SessionCheckResponse>(url, httpOptions)
             .pipe(
                 tap(response => {
@@ -180,7 +184,8 @@ export class AuthenticationService {
      * Logout - revoke tokens and clear session
      */
     async logout(): Promise<void> {
-        const url = `${this.locationStrategy.getBaseHref()}auth/logout`;
+        const apiBaseUrl = this.appConfigService.envProperties?.apiBaseUrl || 'http://localhost:8080';
+        const url = `${apiBaseUrl}/auth/logout`;
         try {
             await firstValueFrom(
                 this.http.post<any>(url, {}, httpOptions)
@@ -215,7 +220,7 @@ export class AuthenticationService {
             roles: authUser.roles,
             rapAdmin: authUser.roles?.includes('ADMIN') || false,
             isActive: authUser.isActive,
-            isExternalUser: true, // All OIDC users are external
+            isExternalUser: authUser.isExternalUser, // Set from backend based on role
             lastLoginAt: authUser.lastLoginAt,
             createdAt: authUser.createdAt
         } as User;
@@ -247,7 +252,8 @@ export class AuthenticationService {
      * Refresh access token (handled by backend via refresh token cookie)
      */
     refreshToken(): Observable<any> {
-        const url = `${this.locationStrategy.getBaseHref()}auth/refresh`;
+        const apiBaseUrl = this.appConfigService.envProperties?.apiBaseUrl || 'http://localhost:8080';
+        const url = `${apiBaseUrl}/auth/refresh`;
         return this.http.post<any>(url, {}, httpOptions)
             .pipe(
                 tap(response => {

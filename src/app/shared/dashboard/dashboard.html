@@ -1,23 +1,199 @@
-<div class="container mt-5">
-  <div class="row">
-    <div class="col-12">
-      <h1>Welcome to the Dashboard</h1>
+<div class="bg-org-topo dashboard-wrapper">
+  <div class="dashboard-container" *ngIf="currentUser">
+    
+    <!-- External User Dashboard -->
+    <div *ngIf="currentUser.isExternalUser" class="external-dashboard">
+      <div class="container-fluid">
       
-      <div *ngIf="currentUser" class="card mt-4">
-        <div class="card-header">
-          <h5>User Information</h5>
-        </div>
-        <div class="card-body">
-          <p><strong>Email:</strong> {{ currentUser.email }}</p>
-          <p><strong>Full Name:</strong> {{ currentUser.fullName || 'Not provided' }}</p>
-          <p><strong>Roles:</strong> {{ currentUser.roles?.join(', ') || 'None' }}</p>
+      <!-- Page Title -->
+      <div class="row mt-4 mb-3">
+        <div class="col-12">
+          <h2 class="page-title">Dashboard</h2>
         </div>
       </div>
 
-      <div class="alert alert-info mt-4">
-        <h5>Dashboard Features</h5>
-        <p>This is your personalized dashboard. More features will be added here.</p>
+      <!-- Three Module Buttons -->
+      <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+          <button mat-raised-button color="primary" class="module-button">
+            Start Application - Module1
+          </button>
+        </div>
+        <div class="col-md-4 mb-3">
+          <button mat-raised-button color="primary" class="module-button">
+            Start Application - Module2
+          </button>
+        </div>
+        <div class="col-md-4 mb-3">
+          <button mat-raised-button color="primary" class="module-button">
+            Start Application - Module3
+          </button>
+        </div>
+      </div>
+
+      <!-- User Email Display -->
+      <div class="row mb-3">
+        <div class="col-12 text-end">
+          <span class="user-info-label">User: <strong>{{ currentUser.email }}</strong></span>
+        </div>
+      </div>
+
+      <!-- Tabs for Action Needed, My Applications, My Permits -->
+      <div class="row">
+        <div class="col-12">
+          <mat-tab-group class="custom-tabs">
+            
+            <!-- Action Needed Tab -->
+            <mat-tab label="Action Needed">
+              <div class="tab-content-wrapper">
+                <div class="filter-section mb-3">
+                  <input type="text" class="form-control filter-input" placeholder="Filter Active Tasks">
+                </div>
+                
+                <div class="table-responsive">
+                  <table class="table table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <th>Function</th>
+                        <th>Task</th>
+                        <th>Application Number</th>
+                        <th>Application Name (Project Title)</th>
+                        <th>Issuing Office</th>
+                        <th>Type</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let task of actionNeededTasks">
+                        <td>{{ task.function }}</td>
+                        <td>{{ task.task }}</td>
+                        <td>{{ task.applicationNumber }}</td>
+                        <td>{{ task.applicationName }}</td>
+                        <td>{{ task.issuingOffice }}</td>
+                        <td>{{ task.type }}</td>
+                      </tr>
+                      <tr *ngIf="actionNeededTasks.length === 0">
+                        <td colspan="6" class="text-center text-muted">No tasks requiring action</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </mat-tab>
+
+            <!-- My Applications Tab -->
+            <mat-tab label="My Applications">
+              <div class="tab-content-wrapper">
+                <div class="filter-section mb-3">
+                  <input type="text" class="form-control filter-input" placeholder="Filter Applications">
+                </div>
+                
+                <div class="table-responsive">
+                  <table class="table table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <th>Application Number</th>
+                        <th>Application Name</th>
+                        <th>Status</th>
+                        <th>Submitted Date</th>
+                        <th>Type</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let app of myApplications">
+                        <td>{{ app.applicationNumber }}</td>
+                        <td>{{ app.applicationName }}</td>
+                        <td>
+                          <span class="badge" [ngClass]="getStatusBadgeClass(app.status)">
+                            {{ app.status }}
+                          </span>
+                        </td>
+                        <td>{{ app.submittedDate }}</td>
+                        <td>{{ app.type }}</td>
+                        <td>
+                          <button mat-icon-button color="primary" title="View">
+                            <mat-icon>visibility</mat-icon>
+                          </button>
+                          <button mat-icon-button color="accent" title="Edit" *ngIf="app.status === 'Draft'">
+                            <mat-icon>edit</mat-icon>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr *ngIf="myApplications.length === 0">
+                        <td colspan="6" class="text-center text-muted">No applications found</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </mat-tab>
+
+            <!-- My Permits Tab -->
+            <mat-tab label="My Permits">
+              <div class="tab-content-wrapper">
+                <div class="filter-section mb-3">
+                  <input type="text" class="form-control filter-input" placeholder="Filter Permits">
+                </div>
+                
+                <div class="table-responsive">
+                  <table class="table table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <th>Permit Number</th>
+                        <th>Permit Type</th>
+                        <th>Status</th>
+                        <th>Issue Date</th>
+                        <th>Expiry Date</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let permit of myPermits">
+                        <td>{{ permit.permitNumber }}</td>
+                        <td>{{ permit.permitType }}</td>
+                        <td>
+                          <span class="badge" [ngClass]="getStatusBadgeClass(permit.status)">
+                            {{ permit.status }}
+                          </span>
+                        </td>
+                        <td>{{ permit.issueDate }}</td>
+                        <td>{{ permit.expiryDate }}</td>
+                        <td>
+                          <button mat-icon-button color="primary" title="View">
+                            <mat-icon>visibility</mat-icon>
+                          </button>
+                          <button mat-icon-button title="Download">
+                            <mat-icon>download</mat-icon>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr *ngIf="myPermits.length === 0">
+                        <td colspan="6" class="text-center text-muted">No permits found</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </mat-tab>
+
+          </mat-tab-group>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Internal User Dashboard (Placeholder for future) -->
+  <div *ngIf="!currentUser.isExternalUser" class="internal-dashboard">
+    <div class="container-fluid mt-4">
+      <div class="alert alert-info">
+        <h4>Internal User Dashboard</h4>
+        <p>Internal user dashboard will be developed in the future.</p>
+        <p><strong>User:</strong> {{ currentUser.email }}</p>
+        <p><strong>Roles:</strong> {{ currentUser.roles?.join(', ') }}</p>
       </div>
     </div>
+  </div>
+
   </div>
 </div>

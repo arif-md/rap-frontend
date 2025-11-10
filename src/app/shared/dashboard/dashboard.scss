@@ -1,0 +1,224 @@
+// Dashboard wrapper with background
+.dashboard-wrapper {
+  min-height: 100%;
+  padding: 1.5rem;
+  background-image: url('/assets/img/bgnd-banner-topo.jpg');
+  background-repeat: no-repeat;
+  background-color: black;
+  background-size: cover;
+  background-position: center;
+}
+
+.dashboard-container {
+  background: #ffffff;
+  padding: 1.5rem;
+  border: 3px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  min-height: calc(100vh - 250px);
+}
+
+// External User Dashboard
+.external-dashboard {
+  .page-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1.5rem;
+  }
+
+  // Module Buttons
+  .module-button {
+    width: 100%;
+    height: 60px;
+    font-size: 1rem;
+    font-weight: 500;
+    text-transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    
+    &:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    }
+  }
+
+  // User Info Label
+  .user-info-label {
+    font-size: 1rem;
+    color: #333;
+    
+    strong {
+      font-weight: 600;
+    }
+  }
+
+  // Custom Tab Styling
+  .custom-tabs {
+    ::ng-deep {
+      .mat-mdc-tab-labels {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+      }
+
+      .mat-mdc-tab {
+        min-width: 120px;
+        font-weight: 500;
+        color: #6c757d;
+
+        &.mdc-tab--active {
+          .mdc-tab__text-label {
+            color: #007bff;
+          }
+        }
+      }
+
+      .mat-mdc-tab-body-wrapper {
+        background: white;
+      }
+    }
+  }
+
+  // Tab Content
+  .tab-content-wrapper {
+    padding: 1.5rem;
+  }
+
+  // Filter Section
+  .filter-section {
+    .filter-input {
+      max-width: 300px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.9rem;
+
+      &:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      }
+    }
+  }
+
+  // Table Styling
+  .table {
+    font-size: 0.9rem;
+    margin-bottom: 0;
+
+    thead {
+      background-color: #f8f9fa;
+
+      th {
+        font-weight: 600;
+        color: #495057;
+        border-bottom: 2px solid #dee2e6;
+        padding: 0.75rem;
+        white-space: nowrap;
+      }
+    }
+
+    tbody {
+      tr {
+        transition: background-color 0.15s ease;
+
+        &:hover {
+          background-color: #f8f9fa;
+        }
+
+        td {
+          padding: 0.75rem;
+          vertical-align: middle;
+          border-top: 1px solid #dee2e6;
+        }
+      }
+    }
+
+    &.table-bordered {
+      border: 1px solid #dee2e6;
+
+      td, th {
+        border: 1px solid #dee2e6;
+      }
+    }
+  }
+
+  // Badge Styling (for status)
+  .badge {
+    padding: 0.35em 0.65em;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+}
+
+// Internal User Dashboard
+.internal-dashboard {
+  padding: 2rem;
+
+  .alert {
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+}
+
+// Material Icon Buttons
+button[mat-icon-button] {
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  mat-icon {
+    font-size: 20px;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .external-dashboard {
+    .page-title {
+      font-size: 1.5rem;
+    }
+
+    .module-button {
+      height: 50px;
+      font-size: 0.9rem;
+    }
+
+    .user-info-label {
+      font-size: 0.9rem;
+    }
+
+    .tab-content-wrapper {
+      padding: 1rem;
+    }
+
+    .table {
+      font-size: 0.85rem;
+
+      thead th,
+      tbody td {
+        padding: 0.5rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .external-dashboard {
+    .custom-tabs {
+      ::ng-deep {
+        .mat-mdc-tab {
+          min-width: 80px;
+          font-size: 0.85rem;
+          padding: 0 8px;
+        }
+      }
+    }
+
+    .filter-section {
+      .filter-input {
+        max-width: 100%;
+      }
+    }
+  }
+}
