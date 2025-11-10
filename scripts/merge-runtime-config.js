@@ -22,6 +22,8 @@ function mergeRuntimeConfig(outputPath) {
         appEnvName: process.env.AZURE_ENV_NAME || 'Local',
         buildVersion: process.env.APP_VERSION || '0.0.1-SNAPSHOT',
         apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:8080',
+        jwtAccessTokenExpirationMinutes: parseInt(process.env.JWT_ACCESS_TOKEN_EXPIRATION_MINUTES || '15', 10),
+        jwtRefreshTokenExpirationDays: parseInt(process.env.JWT_REFRESH_TOKEN_EXPIRATION_DAYS || '7', 10),
         _runtimeGenerated: true,
         _generatedAt: new Date().toISOString()
     };

@@ -2,6 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
+// Load environment variables from .env file (if exists)
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+
 // Helper function to safely execute git commands
 function getGitInfo() {
   try {
@@ -84,7 +87,9 @@ function main() {
     appEnvName: envName,
     isCI: ciEnvironment,
     buildType: ciEnvironment ? 'ci' : 'local',
-    apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:8080'
+    apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:8080',
+    jwtAccessTokenExpirationMinutes: parseInt(process.env.JWT_ACCESS_TOKEN_EXPIRATION_MINUTES || '15', 10),
+    jwtRefreshTokenExpirationDays: parseInt(process.env.JWT_REFRESH_TOKEN_EXPIRATION_DAYS || '7', 10)
   };
 
   // Ensure assets directory exists

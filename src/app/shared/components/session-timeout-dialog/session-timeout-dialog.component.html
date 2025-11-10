@@ -1,0 +1,31 @@
+<div class="session-timeout-dialog">
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon class="warning-icon">warning</mat-icon>
+    Session Timeout Warning
+  </h2>
+
+  <mat-dialog-content class="dialog-content">
+    <div class="message">
+      <p>Your session is about to expire due to inactivity.</p>
+      <p class="sub-message">Would you like to extend your session?</p>
+    </div>
+
+    <div class="countdown-display">
+      <div class="countdown-label">Time Remaining</div>
+      <div class="countdown-timer" [class.critical]="remainingSeconds <= 10">
+        {{ getFormattedTime() }}
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-raised-button color="primary" (click)="extendSession()" class="extend-button">
+      <mat-icon>refresh</mat-icon>
+      Extend Session
+    </button>
+    <button mat-button (click)="logout()" class="logout-button">
+      <mat-icon>logout</mat-icon>
+      Logout
+    </button>
+  </mat-dialog-actions>
+</div>

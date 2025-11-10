@@ -22,6 +22,8 @@ export class EnvironmentProps {
     sciMapApiKey: string;
     palMapApiKey: string;
     recMapApiKey: string;
+    jwtAccessTokenExpirationMinutes?: number;
+    jwtRefreshTokenExpirationDays?: number;
 }
 
 @Injectable({
@@ -49,6 +51,8 @@ export class EnvironmentPropsAdapter implements Rest2Form<EnvironmentProps> {
         result.recMapApiKey = item.recMapApiKey;
         result.sciMapApiKey = item.sciMapApiKey;
         result.palMapApiKey = item.palMapApiKey;
+        result.jwtAccessTokenExpirationMinutes = item.jwtAccessTokenExpirationMinutes;
+        result.jwtRefreshTokenExpirationDays = item.jwtRefreshTokenExpirationDays;
         return result;
     }
 }

@@ -22,6 +22,8 @@ else
   "appEnvName": "${AZURE_ENV_NAME:-Local}",
   "buildVersion": "${APP_VERSION:-0.0.1-SNAPSHOT}",
   "apiBaseUrl": "${API_BASE_URL:-http://localhost:8080}",
+  "jwtAccessTokenExpirationMinutes": ${JWT_ACCESS_TOKEN_EXPIRATION_MINUTES:-15},
+  "jwtRefreshTokenExpirationDays": ${JWT_REFRESH_TOKEN_EXPIRATION_DAYS:-7},
   "_runtimeGenerated": true,
   "_generatedAt": "$(date -Iseconds)",
   "_fallbackMode": true

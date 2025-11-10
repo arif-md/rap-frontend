@@ -2,6 +2,7 @@ import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { User } from '@app/shared/model/admin';
 import { ApplicationService, AppConfigService, AuthenticationService } from '@app/global-services';
+import { SessionTimerService } from '@app/global-services/session-timer.service';
 import { NgClass, NgIf } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
@@ -24,10 +25,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private applicationService = inject(ApplicationService);
     private appConfigService = inject(AppConfigService);
     private authService = inject(AuthenticationService);
+    private sessionTimerService = inject(SessionTimerService);
     
     currentUser: User | null;
     currentUserSubscription!: Subscription;
     moduleSubscription!: Subscription;
+    sessionTimerSubscription!: Subscription;
     module!: string;
     module_rec!: string;
     module_pal!: string;
@@ -38,6 +41,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     isDirtyBuild: boolean = false;
     path_login: string = PATH_LOGIN;
     navbarCollapsed: boolean = true;
+    
+    // Session timer state
+    sessionTimeRemaining: string = '';
+    isSessionExpiringSoon: boolean = false;
 
     constructor() {
         // Will be hydrated from AppConfigService (runtime-config.json); fallback to 'Local'
@@ -57,6 +64,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
             user => this.currentUser = user
         );
         
+        // Subscribe to session timer state
+        this.sessionTimerSubscription = this.sessionTimerService.sessionState$.subscribe(state => {
+            this.sessionTimeRemaining = this.sessionTimerService.getFormattedTimeRemaining();
+            this.isSessionExpiringSoon = state.isExpiringSoon;
+        });
+        
         // Load runtime config and set envName
         this.appConfigService.loadEnvProperties().subscribe((props: any) => {
             if (props?.appEnvName) {
@@ -74,7 +87,23 @@ export class HeaderComponent implements OnInit, OnDestroy {
      * Logout user
      */
     async logout(): Promise<void> {
+        this.sessionTimerService.stopSession();
         await this.authService.logout();
+    }
+    
+    /**
+     * Extend session by refreshing token
+     */
+    async extendSession(): Promise<void> {
+        try {
+            console.log('Extending session from header button click...');
+            await this.sessionTimerService.extendSession();
+            console.log('Session extended successfully from header');
+        } catch (error) {
+            console.error('Error extending session from header:', error);
+            // Error is already handled in SessionTimerService
+            // Only logout happens on 401 errors, other errors are non-fatal
+        }
     }
 
     /**
@@ -121,6 +150,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
         }
         if (this.moduleSubscription) {
             this.moduleSubscription.unsubscribe();
+        }
+        if (this.sessionTimerSubscription) {
+            this.sessionTimerSubscription.unsubscribe();
         }
     }
 

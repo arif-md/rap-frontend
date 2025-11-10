@@ -95,8 +95,13 @@
                                 </button>
                             </li>
                             <li class="nav-item">
-                                <button class="btn btn-outline-warning nav-button">
-                                    <i class="bi bi-clock me-1"></i>Session Remaining
+                                <button 
+                                    class="btn nav-button" 
+                                    [ngClass]="isSessionExpiringSoon ? 'btn-outline-danger' : 'btn-outline-warning'"
+                                    (click)="extendSession()"
+                                    [title]="isSessionExpiringSoon ? 'Session expiring soon! Click to extend' : 'Click to extend session'">
+                                    <i class="bi bi-arrow-clockwise me-1" [ngClass]="{'text-danger': isSessionExpiringSoon}"></i>
+                                    Session Remaining: {{ sessionTimeRemaining || '15:00' }}
                                 </button>
                             </li>
                         </ul>

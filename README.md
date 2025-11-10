@@ -2,6 +2,22 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.4.
 
+## 📚 Documentation
+
+### Configuration Management
+- **[Configuration Management Guide](../docs/CONFIGURATION-MANAGEMENT.md)** - ⚙️ **IMPORTANT** - How configuration flows through environments
+  - Learn how `.env` files work in local vs Azure
+  - Understand `runtime-config.json` generation
+  - JWT timeout and API URL configuration
+  - Common pitfalls and solutions
+
+### Development Guides
+- **[Version Management](VERSION_MANAGEMENT.md)** - Build versioning and runtime config
+- **[Frontend OIDC Implementation](FRONTEND-OIDC-IMPLEMENTATION.md)** - Authentication setup
+- **[Dev Script Guide](FRONTEND-DEV-SCRIPT.md)** - Using `dev.ps1` helper scripts
+
+---
+
 ## CI/CD overview
 
 This repo has an automated workflow at `.github/workflows/frontend-image.yaml` that:

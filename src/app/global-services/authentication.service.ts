@@ -7,6 +7,7 @@ import { PATH_LOGIN } from '@app/shared/model';
 import { LocationStrategy } from '@angular/common';
 import { Router } from '@angular/router';
 import { AppConfigService } from './app-config.service';
+import { SessionTimerService } from './session-timer.service';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
@@ -42,6 +43,7 @@ export class AuthenticationService {
     private locationStrategy = inject(LocationStrategy);
     private adapter = inject(UserAdapter);
     private appConfigService = inject(AppConfigService);
+    private sessionTimerService = inject(SessionTimerService);
 
     private currentUserSubject: BehaviorSubject<User | null>;
     public currentUser: Observable<User | null>;
@@ -121,6 +123,8 @@ export class AuthenticationService {
                         // Convert backend user to frontend User model
                         const frontendUser = this.convertToFrontendUser(user);
                         this.currentUserValue = frontendUser;
+                        // Start session timer
+                        this.sessionTimerService.startSession();
                     }
                 }),
                 catchError(this.errorHandler)
@@ -142,6 +146,10 @@ export class AuthenticationService {
                     } else if (response.authenticated && response.user) {
                         const frontendUser = this.convertToFrontendUser(response.user);
                         this.currentUserValue = frontendUser;
+                        // Ensure session timer is running
+                        if (!this.sessionTimerService.isTimerActive()) {
+                            this.sessionTimerService.startSession();
+                        }
                     } else if (!response.authenticated) {
                         this.clearUserDetails();
                     }
@@ -204,6 +212,8 @@ export class AuthenticationService {
     async clearUserDetails(): Promise<void> {
         localStorage.removeItem('currentUser');
         this.currentUserSubject.next(null);
+        // Stop session timer
+        this.sessionTimerService.stopSession();
     }
 
     /**
