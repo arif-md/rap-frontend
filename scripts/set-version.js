@@ -87,9 +87,9 @@ function main() {
     appEnvName: envName,
     isCI: ciEnvironment,
     buildType: ciEnvironment ? 'ci' : 'local',
-    apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:8080',
-    jwtAccessTokenExpirationMinutes: parseInt(process.env.JWT_ACCESS_TOKEN_EXPIRATION_MINUTES || '15', 10),
-    jwtRefreshTokenExpirationDays: parseInt(process.env.JWT_REFRESH_TOKEN_EXPIRATION_DAYS || '7', 10)
+    apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:8080'
+    // Note: JWT timeout values are NOT set here
+    // Frontend fetches them from backend at /api/config/environmentProperties
   };
 
   // Ensure assets directory exists

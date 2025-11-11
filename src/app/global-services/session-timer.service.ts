@@ -18,7 +18,8 @@ export class SessionTimerService {
   private appConfigService = inject(AppConfigService);
 
   // JWT Token Expiration (loaded dynamically from backend configuration)
-  private tokenLifetimeMinutes = 15; // Default fallback, will be updated from config
+  // No default value - must be fetched from backend at /api/config/environmentProperties
+  private tokenLifetimeMinutes: number | null = null;
   private readonly WARNING_THRESHOLD_SECONDS = 60; // Show warning 1 minute before expiry
   
   // Session state
@@ -80,6 +81,12 @@ export class SessionTimerService {
    * Reset the session timer (called after successful token refresh)
    */
   resetTimer(): void {
+    // Don't start timer if JWT timeout hasn't been loaded from backend yet
+    if (this.tokenLifetimeMinutes === null) {
+      console.warn('[SessionTimer] Cannot start timer - JWT timeout not yet loaded from backend');
+      return;
+    }
+
     const now = Date.now();
     const expiresAt = now + (this.tokenLifetimeMinutes * 60 * 1000);
     
@@ -273,6 +280,11 @@ export class SessionTimerService {
 
     // Check for inactivity every 30 seconds
     this.activityCheckInterval = setInterval(() => {
+      // Skip check if JWT timeout not loaded yet
+      if (this.tokenLifetimeMinutes === null) {
+        return;
+      }
+
       const now = Date.now();
       const inactiveTime = now - this.lastActivityTime;
       const inactiveMinutes = inactiveTime / (60 * 1000);
@@ -293,5 +305,12 @@ export class SessionTimerService {
    */
   getCurrentState(): SessionTimerState {
     return this.sessionStateSubject.value;
+  }
+
+  /**
+   * Get the configured JWT token lifetime in minutes
+   */
+  getTokenLifetimeMinutes(): number | null {
+    return this.tokenLifetimeMinutes;
   }
 }

@@ -46,20 +46,62 @@ export class AppConfigService {
     }*/
 
     loadEnvProperties(): Observable<EnvironmentProps> {
-        // Prefer runtime configuration served as a static JSON, fallback to API endpoint if not present
+        // Load runtime configuration first
+        // In Azure: runtime-config.json is pre-merged with backend config via merge-runtime-config.js
+        // In local dev: runtime-config.json may not have JWT timeout, so we fetch from backend API
         const base = this.locationStrategy.getBaseHref();
         const runtimeUrl = `${base}assets/runtime-config.json`;
-        const apiUrl = `${base}${URL_CONFIG_ENV_PROPS}`;
 
         return this.http.get<EnvironmentProps>(runtimeUrl, httpOptions)
             .pipe(
-                catchError(() => this.http.get<EnvironmentProps>(apiUrl, httpOptions)),
-                tap(recvdProps => {
-                    this.props = this.envPropsAdapter.restToForm(recvdProps);
-                    this.envPropsSubject.next(this.props);
+                catchError(() => {
+                    // If runtime-config.json doesn't exist, construct backend API URL
+                    const backendApiUrl = this.getBackendApiUrl(null);
+                    return this.http.get<EnvironmentProps>(backendApiUrl, httpOptions);
+                }),
+                tap(runtimeProps => {
+                    // Check if JWT timeout is missing (local dev scenario)
+                    if (!runtimeProps.jwtAccessTokenExpirationMinutes) {
+                        console.log('[AppConfig] JWT timeout missing from runtime config, fetching from backend API');
+                        // Construct backend API URL using apiBaseUrl from runtime config
+                        const backendApiUrl = this.getBackendApiUrl(runtimeProps.apiBaseUrl);
+                        
+                        // Fetch backend config to get JWT timeouts
+                        this.http.get<EnvironmentProps>(backendApiUrl, httpOptions).subscribe({
+                            next: (backendProps) => {
+                                // Merge: runtime config + backend JWT settings
+                                const mergedProps = {
+                                    ...runtimeProps,
+                                    jwtAccessTokenExpirationMinutes: backendProps.jwtAccessTokenExpirationMinutes,
+                                    jwtRefreshTokenExpirationDays: backendProps.jwtRefreshTokenExpirationDays
+                                };
+                                this.props = this.envPropsAdapter.restToForm(mergedProps);
+                                this.envPropsSubject.next(this.props);
+                            },
+                            error: (err) => {
+                                console.error('[AppConfig] Failed to load JWT config from backend', err);
+                                // Use runtime config as fallback (will cause timer to not work)
+                                this.props = this.envPropsAdapter.restToForm(runtimeProps);
+                                this.envPropsSubject.next(this.props);
+                            }
+                        });
+                    } else {
+                        // JWT timeout exists (Azure scenario - already merged)
+                        this.props = this.envPropsAdapter.restToForm(runtimeProps);
+                        this.envPropsSubject.next(this.props);
+                    }
                 }),
                 catchError(this.errorHandler)
             );
+    }
+
+    /**
+     * Construct backend API URL for config endpoint
+     * Uses apiBaseUrl from runtime config, or defaults to localhost:8080
+     */
+    private getBackendApiUrl(apiBaseUrl: string | undefined | null): string {
+        const backendBase = apiBaseUrl || 'http://localhost:8080';
+        return `${backendBase}/${URL_CONFIG_ENV_PROPS}`;
     }
 
     //TODO: this getter should be removed, use envPropObs instead of this getter.

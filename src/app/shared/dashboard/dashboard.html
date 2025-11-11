@@ -41,7 +41,7 @@
       <!-- Tabs for Action Needed, My Applications, My Permits -->
       <div class="row">
         <div class="col-12">
-          <mat-tab-group class="custom-tabs">
+          <mat-tab-group class="custom-tabs" (selectedTabChange)="onTabChange($event)">
             
             <!-- Action Needed Tab -->
             <mat-tab label="Action Needed">
@@ -71,12 +71,25 @@
                         <td>{{ task.issuingOffice }}</td>
                         <td>{{ task.type }}</td>
                       </tr>
-                      <tr *ngIf="actionNeededTasks.length === 0">
+                      <tr *ngIf="(actionNeededTasks?.length ?? 0) === 0 && !tasksLoading">
                         <td colspan="6" class="text-center text-muted">No tasks requiring action</td>
+                      </tr>
+                      <tr *ngIf="tasksLoading">
+                        <td colspan="6" class="text-center text-muted">Loading tasks...</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
+                
+                <!-- Pagination for Action Needed -->
+                <mat-paginator 
+                  [length]="tasksTotalElements || 0"
+                  [pageSize]="tasksSize"
+                  [pageSizeOptions]="[5, 10, 25, 50]"
+                  [pageIndex]="tasksPage"
+                  (page)="onTasksPageChange($event)"
+                  showFirstLastButtons>
+                </mat-paginator>
               </div>
             </mat-tab>
 
@@ -91,40 +104,51 @@
                   <table class="table table-bordered table-hover">
                     <thead>
                       <tr>
-                        <th>Application Number</th>
+                        <th>Application Code</th>
                         <th>Application Name</th>
                         <th>Status</th>
-                        <th>Submitted Date</th>
-                        <th>Type</th>
+                        <th>Created Date</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr *ngFor="let app of myApplications">
-                        <td>{{ app.applicationNumber }}</td>
+                        <td>{{ app.applicationCode }}</td>
                         <td>{{ app.applicationName }}</td>
                         <td>
                           <span class="badge" [ngClass]="getStatusBadgeClass(app.status)">
                             {{ app.status }}
                           </span>
                         </td>
-                        <td>{{ app.submittedDate }}</td>
-                        <td>{{ app.type }}</td>
+                        <td>{{ app.createdAt | date:'short' }}</td>
                         <td>
                           <button mat-icon-button color="primary" title="View">
                             <mat-icon>visibility</mat-icon>
                           </button>
-                          <button mat-icon-button color="accent" title="Edit" *ngIf="app.status === 'Draft'">
+                          <button mat-icon-button color="accent" title="Edit" *ngIf="app.status === 'DRAFT'">
                             <mat-icon>edit</mat-icon>
                           </button>
                         </td>
                       </tr>
-                      <tr *ngIf="myApplications.length === 0">
-                        <td colspan="6" class="text-center text-muted">No applications found</td>
+                      <tr *ngIf="(myApplications?.length ?? 0) === 0 && !applicationsLoading">
+                        <td colspan="5" class="text-center text-muted">No applications found</td>
+                      </tr>
+                      <tr *ngIf="applicationsLoading">
+                        <td colspan="5" class="text-center text-muted">Loading applications...</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
+                
+                <!-- Pagination for My Applications -->
+                <mat-paginator 
+                  [length]="applicationsTotalElements || 0"
+                  [pageSize]="applicationsSize"
+                  [pageSizeOptions]="[5, 10, 25, 50]"
+                  [pageIndex]="applicationsPage"
+                  (page)="onApplicationsPageChange($event)"
+                  showFirstLastButtons>
+                </mat-paginator>
               </div>
             </mat-tab>
 
@@ -156,8 +180,8 @@
                             {{ permit.status }}
                           </span>
                         </td>
-                        <td>{{ permit.issueDate }}</td>
-                        <td>{{ permit.expiryDate }}</td>
+                        <td>{{ permit.issueDate | date:'shortDate' }}</td>
+                        <td>{{ permit.expiryDate | date:'shortDate' }}</td>
                         <td>
                           <button mat-icon-button color="primary" title="View">
                             <mat-icon>visibility</mat-icon>
@@ -167,12 +191,25 @@
                           </button>
                         </td>
                       </tr>
-                      <tr *ngIf="myPermits.length === 0">
+                      <tr *ngIf="(myPermits?.length ?? 0) === 0 && !permitsLoading">
                         <td colspan="6" class="text-center text-muted">No permits found</td>
+                      </tr>
+                      <tr *ngIf="permitsLoading">
+                        <td colspan="6" class="text-center text-muted">Loading permits...</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
+                
+                <!-- Pagination for My Permits -->
+                <mat-paginator 
+                  [length]="permitsTotalElements || 0"
+                  [pageSize]="permitsSize"
+                  [pageSizeOptions]="[5, 10, 25, 50]"
+                  [pageIndex]="permitsPage"
+                  (page)="onPermitsPageChange($event)"
+                  showFirstLastButtons>
+                </mat-paginator>
               </div>
             </mat-tab>
 
