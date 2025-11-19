@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, Injector } from '@angular/core';
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -10,8 +10,25 @@ const CONFIRM_ERROR_ICON = 'error'; // Adjust based on your actual icon constant
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
-    private authenticationService = inject(AuthenticationService);
-    private dialog = inject(MatDialog);
+    private injector = inject(Injector);
+
+    // Lazy-loaded services to avoid circular dependency
+    private _authenticationService?: AuthenticationService;
+    private _dialog?: MatDialog;
+
+    private get authenticationService(): AuthenticationService {
+        if (!this._authenticationService) {
+            this._authenticationService = this.injector.get(AuthenticationService);
+        }
+        return this._authenticationService;
+    }
+
+    private get dialog(): MatDialog {
+        if (!this._dialog) {
+            this._dialog = this.injector.get(MatDialog);
+        }
+        return this._dialog;
+    }
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         return next.handle(request).pipe(catchError(err => {

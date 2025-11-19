@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, Injector } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError, firstValueFrom } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
@@ -38,12 +38,57 @@ interface SessionCheckResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {
-    private router = inject(Router);
-    private http = inject(HttpClient);
-    private locationStrategy = inject(LocationStrategy);
-    private adapter = inject(UserAdapter);
-    private appConfigService = inject(AppConfigService);
-    private sessionTimerService = inject(SessionTimerService);
+    private injector = inject(Injector);
+    
+    // Lazy-loaded services to avoid circular dependency with HttpClient → Interceptors
+    private _router?: Router;
+    private _http?: HttpClient;
+    private _locationStrategy?: LocationStrategy;
+    private _adapter?: UserAdapter;
+    private _appConfigService?: AppConfigService;
+    private _sessionTimerService?: SessionTimerService;
+
+    private get router(): Router {
+        if (!this._router) {
+            this._router = this.injector.get(Router);
+        }
+        return this._router;
+    }
+
+    private get http(): HttpClient {
+        if (!this._http) {
+            this._http = this.injector.get(HttpClient);
+        }
+        return this._http;
+    }
+
+    private get locationStrategy(): LocationStrategy {
+        if (!this._locationStrategy) {
+            this._locationStrategy = this.injector.get(LocationStrategy);
+        }
+        return this._locationStrategy;
+    }
+
+    private get adapter(): UserAdapter {
+        if (!this._adapter) {
+            this._adapter = this.injector.get(UserAdapter);
+        }
+        return this._adapter;
+    }
+
+    private get appConfigService(): AppConfigService {
+        if (!this._appConfigService) {
+            this._appConfigService = this.injector.get(AppConfigService);
+        }
+        return this._appConfigService;
+    }
+
+    private get sessionTimerService(): SessionTimerService {
+        if (!this._sessionTimerService) {
+            this._sessionTimerService = this.injector.get(SessionTimerService);
+        }
+        return this._sessionTimerService;
+    }
 
     private currentUserSubject: BehaviorSubject<User | null>;
     public currentUser: Observable<User | null>;

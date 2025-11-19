@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, Injector } from '@angular/core';
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError, filter, take, switchMap, mergeMap } from 'rxjs/operators';
@@ -7,10 +7,27 @@ import { SessionTimerService } from '@app/global-services/session-timer.service'
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-    private authService = inject(AuthenticationService);
-    private sessionTimerService = inject(SessionTimerService);
+    private injector = inject(Injector);
     private isRefreshing = false;
     private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+
+    // Lazy-loaded services to avoid circular dependency
+    private _authService?: AuthenticationService;
+    private _sessionTimerService?: SessionTimerService;
+
+    private get authService(): AuthenticationService {
+        if (!this._authService) {
+            this._authService = this.injector.get(AuthenticationService);
+        }
+        return this._authService;
+    }
+
+    private get sessionTimerService(): SessionTimerService {
+        if (!this._sessionTimerService) {
+            this._sessionTimerService = this.injector.get(SessionTimerService);
+        }
+        return this._sessionTimerService;
+    }
 
     // Sliding expiration: Refresh token on every API request when less than this percentage of lifetime remains
     // This mimics HTTP session behavior where every request extends the session
@@ -109,6 +126,9 @@ export class AuthInterceptor implements HttpInterceptor {
 
                     this.refreshTokenSubject.next(response);
                     console.log('[AuthInterceptor] Sliding expiration refresh successful - session extended');
+                    
+                    // Reset the session timer to extend the session (like HTTP sessions do)
+                    this.sessionTimerService.resetTimer();
 
                     // Proceed with original request
                     return next.handle(request.clone({ withCredentials: true }));
@@ -164,6 +184,9 @@ export class AuthInterceptor implements HttpInterceptor {
                     
                     this.refreshTokenSubject.next(response);
                     console.log('[AuthInterceptor] Reactive refresh successful (after 401)');
+                    
+                    // Reset the session timer to extend the session
+                    this.sessionTimerService.resetTimer();
                     
                     // Retry original request
                     return next.handle(request.clone({ withCredentials: true }));

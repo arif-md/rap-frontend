@@ -13,9 +13,25 @@ export interface SessionTimerState {
 
 @Injectable({ providedIn: 'root' })
 export class SessionTimerService {
-  private dialog = inject(MatDialog);
   private injector = inject(Injector);
-  private appConfigService = inject(AppConfigService);
+  
+  // Lazy-loaded services to avoid circular dependency
+  private _dialog?: MatDialog;
+  private _appConfigService?: AppConfigService;
+
+  private get dialog(): MatDialog {
+    if (!this._dialog) {
+      this._dialog = this.injector.get(MatDialog);
+    }
+    return this._dialog;
+  }
+
+  private get appConfigService(): AppConfigService {
+    if (!this._appConfigService) {
+      this._appConfigService = this.injector.get(AppConfigService);
+    }
+    return this._appConfigService;
+  }
 
   // JWT Token Expiration (loaded dynamically from backend configuration)
   // No default value - must be fetched from backend at /api/config/environmentProperties

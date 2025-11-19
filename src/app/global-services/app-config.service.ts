@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, Injector } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { EnvironmentProps, EnvironmentPropsAdapter, ErrorResponse, URL_CONFIG_ENV_PROPS } from '@app/shared/model';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
@@ -14,9 +14,33 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class AppConfigService {
-    private http = inject(HttpClient);
-    private locationStrategy = inject(LocationStrategy);
-    private envPropsAdapter = inject(EnvironmentPropsAdapter);
+    private injector = inject(Injector);
+    
+    // Lazy-loaded services to avoid circular dependency
+    private _http?: HttpClient;
+    private _locationStrategy?: LocationStrategy;
+    private _envPropsAdapter?: EnvironmentPropsAdapter;
+
+    private get http(): HttpClient {
+        if (!this._http) {
+            this._http = this.injector.get(HttpClient);
+        }
+        return this._http;
+    }
+
+    private get locationStrategy(): LocationStrategy {
+        if (!this._locationStrategy) {
+            this._locationStrategy = this.injector.get(LocationStrategy);
+        }
+        return this._locationStrategy;
+    }
+
+    private get envPropsAdapter(): EnvironmentPropsAdapter {
+        if (!this._envPropsAdapter) {
+            this._envPropsAdapter = this.injector.get(EnvironmentPropsAdapter);
+        }
+        return this._envPropsAdapter;
+    }
 
     //TODO: Instead of props variable, envPropObs should be used. remove props variable.
     private props: EnvironmentProps;
