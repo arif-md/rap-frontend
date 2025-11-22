@@ -35,9 +35,10 @@ COPY --from=build /app/dist/frontend/browser /usr/share/nginx/html
 # Copy runtime configuration merge script
 COPY scripts/merge-runtime-config.js /usr/share/nginx/html/scripts/merge-runtime-config.js
 
-# Copy and setup entrypoint script
+# Copy and setup entrypoint script (convert Windows line endings to Unix)
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh && \
+    sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 80
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
