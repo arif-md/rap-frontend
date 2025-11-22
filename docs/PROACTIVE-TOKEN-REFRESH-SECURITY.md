@@ -395,7 +395,7 @@ The proactive refresh implementation follows industry best practices and doesn't
 
 1. **OAuth 2.0 RFC 6749**: https://datatracker.ietf.org/doc/html/rfc6749
 2. **OWASP Session Management**: https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html
-3. **NIST SP 800-63B**: https://pages.nist.gov/800-63-3/sp800-63b.html
+3. **NIST SP 800-63B**: https://pages.nist.dev/800-63-3/sp800-63b.html
 4. **Auth0 Refresh Tokens**: https://auth0.com/docs/secure/tokens/refresh-tokens
 5. **Azure AD Continuous Access Evaluation**: https://learn.microsoft.com/en-us/azure/active-directory/develop/app-resilience-continuous-access-evaluation
 6. **OWASP ASVS**: https://owasp.org/www-project-application-security-verification-standard/
