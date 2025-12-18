@@ -99,13 +99,15 @@ export class AuthenticationService {
         this.currentUserSubject = new BehaviorSubject<User | null>(storedUser ? JSON.parse(storedUser) : null);
         this.currentUser = this.currentUserSubject.asObservable();
         
-        // Check session on initialization
-        this.checkSession().subscribe({
-            error: (err) => {
-                // Silently fail on initialization - user is just not authenticated
-                console.debug('Session check failed on initialization:', err);
-            }
-        });
+        // Only check session if we have a stored user (avoid unnecessary 401 on login page)
+        if (storedUser) {
+            this.checkSession().subscribe({
+                error: (err) => {
+                    // Silently fail on initialization - user is just not authenticated
+                    console.debug('Session check failed on initialization:', err);
+                }
+            });
+        }
         
         // Set up periodic session check (every 5 minutes)
         this.setupSessionCheck();
@@ -234,19 +236,37 @@ export class AuthenticationService {
     }
 
     /**
-     * Logout - revoke tokens and clear session
+     * Logout - revoke tokens, clear session, and end OIDC session
      */
     async logout(): Promise<void> {
+        console.log('[AUTH] Logout initiated');
         const apiBaseUrl = this.appConfigService.envProperties?.apiBaseUrl || 'http://localhost:8080';
         const url = `${apiBaseUrl}/auth/logout`;
+        console.log('[AUTH] Calling logout endpoint:', url);
+        
         try {
-            await firstValueFrom(
-                this.http.post<any>(url, {}, httpOptions)
+            console.log('[AUTH] Making HTTP POST request to backend (cookies will be sent)...');
+            const response = await firstValueFrom(
+                this.http.post<{ success: boolean; message: string; oidcLogoutUrl?: string }>(url, {}, httpOptions)
             );
-        } catch (error) {
-            console.error('Logout error:', error);
-        } finally {
+            console.log('[AUTH] Logout response received:', response);
+            
+            // Clear local session AFTER successful backend logout
             await this.clearUserDetails();
+            
+            // If OIDC logout URL is provided, redirect to OIDC provider to end session
+            if (response && response.oidcLogoutUrl) {
+                console.log('[AUTH] Redirecting to OIDC provider logout:', response.oidcLogoutUrl);
+                window.location.href = response.oidcLogoutUrl;
+            } else {
+                console.log('[AUTH] No OIDC logout URL, navigating to login page');
+                this.router.navigate(['/' + PATH_LOGIN]);
+            }
+        } catch (error) {
+            console.error('[AUTH] Logout error:', error);
+            // Even if logout API fails, clear local session
+            await this.clearUserDetails();
+            console.log('[AUTH] Navigating to login page after error');
             this.router.navigate(['/' + PATH_LOGIN]);
         }
     }
@@ -255,8 +275,10 @@ export class AuthenticationService {
      * Clear user details from local storage and state
      */
     async clearUserDetails(): Promise<void> {
+        console.log('[AUTH] Clearing user details');
         localStorage.removeItem('currentUser');
         this.currentUserSubject.next(null);
+        console.log('[AUTH] User cleared. isAuthenticated:', this.isAuthenticated());
         // Stop session timer
         this.sessionTimerService.stopSession();
     }

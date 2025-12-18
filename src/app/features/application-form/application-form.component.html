@@ -1,0 +1,163 @@
+<div class="bg-org-topo application-form-wrapper">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-md-10">
+        
+        <!-- Page Header -->
+        <div class="page-header mt-4 mb-4">
+          <h2 class="page-title">University Admission Application - Module 1</h2>
+          <p class="page-subtitle">Please fill in all required fields to submit your application</p>
+        </div>
+
+        <!-- Error Alert -->
+        <div class="alert alert-danger" *ngIf="errorMessage" role="alert">
+          <mat-icon class="alert-icon">error</mat-icon>
+          {{ errorMessage }}
+        </div>
+
+        <!-- Application Form Card -->
+        <mat-card class="application-card">
+          <mat-card-content>
+            <form [formGroup]="applicationForm" (ngSubmit)="onSubmit()" class="application-form">
+              
+              <!-- Application Name -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Application Name / Project Title</mat-label>
+                <input matInput 
+                       formControlName="applicationName"
+                       placeholder="Enter application or project title"
+                       required>
+                <mat-error *ngIf="hasError('applicationName', 'required')">
+                  Application name is required
+                </mat-error>
+                <mat-error *ngIf="hasError('applicationName', 'minlength')">
+                  Minimum 3 characters required
+                </mat-error>
+                <mat-error *ngIf="hasError('applicationName', 'maxlength')">
+                  Maximum 200 characters allowed
+                </mat-error>
+              </mat-form-field>
+
+              <!-- University Selection -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Select University</mat-label>
+                <mat-select formControlName="university" required>
+                  <mat-option *ngFor="let univ of universities" [value]="univ">
+                    {{ univ }}
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="hasError('university', 'required')">
+                  Please select a university
+                </mat-error>
+              </mat-form-field>
+
+              <!-- Personal Information Section -->
+              <h3 class="section-title">Personal Information</h3>
+
+              <!-- First and Last Name Row -->
+              <div class="row">
+                <div class="col-md-6">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>First Name</mat-label>
+                    <input matInput 
+                           formControlName="firstName"
+                           placeholder="Enter first name"
+                           required>
+                    <mat-error>{{ getErrorMessage('firstName') }}</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Last Name</mat-label>
+                    <input matInput 
+                           formControlName="lastName"
+                           placeholder="Enter last name"
+                           required>
+                    <mat-error>{{ getErrorMessage('lastName') }}</mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <!-- Email and Phone Row -->
+              <div class="row">
+                <div class="col-md-6">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Email Address</mat-label>
+                    <input matInput 
+                           type="email"
+                           formControlName="email"
+                           placeholder="Enter email address"
+                           required>
+                    <mat-error>{{ getErrorMessage('email') }}</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Phone Number</mat-label>
+                    <input matInput 
+                           formControlName="phone"
+                           placeholder="Enter phone number"
+                           required>
+                    <mat-error>{{ getErrorMessage('phone') }}</mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <!-- Program Section -->
+              <h3 class="section-title">Academic Information</h3>
+
+              <!-- Program Selection -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Program of Study</mat-label>
+                <mat-select formControlName="program" required>
+                  <mat-option *ngFor="let prog of programs" [value]="prog">
+                    {{ prog }}
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="hasError('program', 'required')">
+                  Please select a program
+                </mat-error>
+              </mat-form-field>
+
+              <!-- Description -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Additional Information (Optional)</mat-label>
+                <textarea matInput 
+                          formControlName="description"
+                          placeholder="Any additional information you'd like to provide"
+                          rows="4"
+                          maxlength="1000"></textarea>
+                <mat-hint align="end">
+                  {{ applicationForm.get('description')?.value?.length || 0 }}/1000
+                </mat-hint>
+              </mat-form-field>
+
+              <!-- Form Actions -->
+              <div class="form-actions">
+                <button mat-raised-button 
+                        type="button"
+                        class="cancel-button"
+                        (click)="onCancel()"
+                        [disabled]="isSubmitting">
+                  Cancel
+                </button>
+                
+                <button mat-raised-button 
+                        color="primary"
+                        type="submit"
+                        class="submit-button"
+                        [disabled]="isSubmitting">
+                  <mat-spinner *ngIf="isSubmitting" diameter="20" class="button-spinner"></mat-spinner>
+                  <span *ngIf="!isSubmitting">Submit Application</span>
+                  <span *ngIf="isSubmitting">Submitting...</span>
+                </button>
+              </div>
+
+            </form>
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+    </div>
+  </div>
+</div>

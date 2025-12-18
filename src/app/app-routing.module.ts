@@ -4,6 +4,7 @@ import { LandingComponent } from '@app/shared/landing/landing.component';
 import { LoginComponent } from '@app/shared/login/login.component';
 import { AuthCallbackComponent } from '@app/shared/auth-callback/auth-callback.component';
 import { Dashboard } from '@app/shared/dashboard/dashboard';
+import { ApplicationFormComponent } from '@app/features/application-form/application-form.component';
 
 import {
     LANDING_TITLE,
@@ -45,6 +46,7 @@ export const routes: Routes = [
 
   // Protected routes
   { path: PATH_DASHBOARD, title: 'Dashboard', component: Dashboard, canActivate: [authGuard] },
+  { path: 'application-form', title: 'Application Form', component: ApplicationFormComponent, canActivate: [authGuard] },
 
   { path: PATH_DEFAULT, redirectTo: PATH_LANDING, pathMatch: 'full' },
   //{ path: PATH_UNSPECIFIED, component: PageNotFoundComponent }

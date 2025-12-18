@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { MatTabsModule, MatTabChangeEvent } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -98,7 +99,8 @@ export class Dashboard implements OnInit {
   constructor(
     private authService: AuthenticationService,
     private appConfigService: AppConfigService,
-    private http: HttpClient
+    private http: HttpClient,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -243,5 +245,20 @@ export class Dashboard implements OnInit {
       default:
         return 'bg-info';
     }
+  }
+
+  // Navigation methods for module buttons
+  onStartApplicationModule1(): void {
+    this.router.navigate(['/application-form']);
+  }
+
+  onStartApplicationModule2(): void {
+    // TODO: Implement Module 2 navigation
+    console.log('Module 2 - Not yet implemented');
+  }
+
+  onStartApplicationModule3(): void {
+    // TODO: Implement Module 3 navigation
+    console.log('Module 3 - Not yet implemented');
   }
 }
