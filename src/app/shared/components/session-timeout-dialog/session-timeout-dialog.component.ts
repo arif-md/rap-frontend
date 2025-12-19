@@ -61,7 +61,7 @@ export class SessionTimeoutDialogComponent implements OnInit, OnDestroy {
    * User chooses to logout
    */
   logout(): void {
-    this.dialogRef.close(false);
+    this.dialogRef.close('logout');
   }
 
   /**

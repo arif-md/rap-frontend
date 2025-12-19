@@ -204,13 +204,20 @@ export class SessionTimerService {
       }
     });
 
-    this.dialogRef.afterClosed().subscribe((extendSession: boolean) => {
+    this.dialogRef.afterClosed().subscribe(async (result: boolean | string) => {
       this.dialogRef = null;
       
-      if (extendSession) {
+      if (result === true) {
+        // User chose to extend session
         this.extendSession();
+      } else if (result === 'logout') {
+        // User chose to logout
+        console.log('User clicked logout in timeout dialog');
+        const { AuthenticationService } = await import('./authentication.service');
+        const authService = this.injector.get(AuthenticationService);
+        await authService.logout();
       } else {
-        // User chose not to extend - let it expire naturally
+        // User declined or dialog timed out - let it expire naturally
         console.log('User declined to extend session');
       }
     });

@@ -15,7 +15,7 @@ const httpOptions = {
 };
 
 interface AuthUser {
-  id: string;
+  id: number;
   email: string;
   fullName: string;
   roles: string[];

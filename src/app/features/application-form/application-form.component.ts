@@ -12,6 +12,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { ApplicationSubmissionService } from './application-submission.service';
 import { SuccessDialogComponent } from './success-dialog/success-dialog.component';
+import { AuthenticationService } from '@app/global-services';
 
 export interface ApplicationSubmissionRequest {
   applicationName: string;
@@ -76,11 +77,22 @@ export class ApplicationFormComponent implements OnInit {
     private fb: FormBuilder,
     private applicationService: ApplicationSubmissionService,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private authService: AuthenticationService
   ) {}
 
   ngOnInit(): void {
     this.initializeForm();
+    this.setUserEmail();
+  }
+
+  private setUserEmail(): void {
+    const currentUser = this.authService.currentUserValue;
+    if (currentUser?.email) {
+      this.applicationForm.patchValue({
+        email: currentUser.email
+      });
+    }
   }
 
   private initializeForm(): void {
