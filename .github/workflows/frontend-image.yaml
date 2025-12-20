@@ -3,7 +3,7 @@ name: Frontend - Build and Push Image (Digest)
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [ az-204 ]
     paths:
       - 'Dockerfile'
       - 'package.json'
