@@ -46,6 +46,13 @@ export class LoginComponent implements OnInit, OnDestroy {
         }
     }
 
+    /**
+     * Redirect to Azure AD authentication
+     */
+    aad(): void {
+        window.location.href = '/.auth/login/aad';
+    }
+
     ngOnDestroy() {
         // Unsubscribe to ensure no memory leaks
         if (this.envProperties) {

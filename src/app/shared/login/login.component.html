@@ -42,6 +42,22 @@
                                 Sign in with OIDC Provider
                             }
                         </button>
+                        <button 
+                            mat-raised-button 
+                            color="primary" 
+                            type="button" 
+                            class="login-button"
+                            (click)="aad()"
+                            [disabled]="isLoading">
+                            @if (isLoading) {
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Redirecting to aad...
+                            } @else {
+                                <i class="bi bi-box-arrow-in-right me-2"></i>
+                                Sign in with aad
+                            }
+                        </button>
+
                     </div>
                 </div>
             </div>
