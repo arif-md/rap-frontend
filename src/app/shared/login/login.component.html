@@ -62,27 +62,6 @@
                                 Sign in with Microsoft (SSO)
                             }
                         </button>
-
-                        @if (enableKeycloakInternal) {
-                            <div class="divider-row my-2">
-                                <hr class="divider-line"><span class="divider-text text-muted">OR</span><hr class="divider-line">
-                            </div>
-
-                            <button
-                                mat-raised-button
-                                type="button"
-                                class="login-button internal-button"
-                                (click)="internalLogin()"
-                                [disabled]="isLoading">
-                                @if (isLoading && loadingProvider === 'internal') {
-                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                    Redirecting to Keycloak...
-                                } @else {
-                                    <i class="bi bi-person-badge me-2"></i>
-                                    Sign in as Internal User (Keycloak)
-                                }
-                            </button>
-                        }
                     </div>
                 </div>
             </div>
@@ -98,10 +77,6 @@
                             <strong>External users:</strong> Click "Sign in with OIDC Provider" to authenticate with your OIDC provider.
                             <br>
                             <strong>Internal users:</strong> Click "Sign in with Microsoft (SSO)" to use your organizational account.
-                            @if (enableKeycloakInternal) {
-                                <br>
-                                <strong>Internal users (offline):</strong> Click "Sign in as Internal User (Keycloak)" for local development without internet.
-                            }
                         </p>
                     </div>
                 </div>

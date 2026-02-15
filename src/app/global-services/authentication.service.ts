@@ -179,27 +179,6 @@ export class AuthenticationService {
     }
 
     /**
-     * Redirect to Keycloak for internal user authentication (offline local development)
-     * Only available when ENABLE_KEYCLOAK_INTERNAL=true on the backend.
-     */
-    async redirectToInternalLogin(): Promise<void> {
-        try {
-            const apiBaseUrl = this.appConfigService.envProperties?.apiBaseUrl || 'http://localhost:8080';
-            const response = await firstValueFrom(
-                this.http.get<{ authorizationUrl: string; message: string }>(`${apiBaseUrl}/auth/internal-login`, httpOptions)
-            );
-            const backendBaseUrl = apiBaseUrl;
-            const authUrl = response.authorizationUrl.startsWith('http')
-                ? response.authorizationUrl
-                : backendBaseUrl + response.authorizationUrl;
-            window.location.href = authUrl;
-        } catch (error) {
-            console.error('Failed to get internal login URL:', error);
-            throw error;
-        }
-    }
-
-    /**
      * Get current authenticated user from backend
      */
     getCurrentUser(): Observable<AuthUser> {

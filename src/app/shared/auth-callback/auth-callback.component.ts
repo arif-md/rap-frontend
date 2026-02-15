@@ -59,7 +59,8 @@ export class AuthCallbackComponent implements OnInit {
         try {
             // Check if this was an internal user login (Azure AD SSO or Keycloak Internal)
             const provider = this.route.snapshot.queryParams['provider'];
-            const isInternalLogin = provider === 'azure-ad' || provider === 'keycloak-internal';
+            const isInternalLogin = provider === 'azure-ad';
+            console.log('[AuthCallback] Processing callback. Provider:', provider, 'isInternalLogin:', isInternalLogin);
 
             // Wait a moment for cookies to be set
             await new Promise(resolve => setTimeout(resolve, 500));
@@ -67,6 +68,17 @@ export class AuthCallbackComponent implements OnInit {
             // Fetch current user details
             this.authService.getCurrentUser().subscribe({
                 next: (user) => {
+                    console.log('[AuthCallback] getCurrentUser response:', {
+                        hasUser: !!user,
+                        email: (user as any)?.email,
+                        roles: (user as any)?.roles,
+                        isExternalUser: (user as any)?.isExternalUser
+                    });
+                    console.log('[AuthCallback] currentUserValue after set:', {
+                        hasValue: !!this.authService.currentUserValue,
+                        isExternalUser: this.authService.currentUserValue?.isExternalUser,
+                        roles: (this.authService.currentUserValue as any)?.roles
+                    });
                     if (user) {
                         if (isInternalLogin) {
                             // Internal user (Azure AD SSO or Keycloak Internal) → navigate to internal dashboard
@@ -79,11 +91,12 @@ export class AuthCallbackComponent implements OnInit {
                             this.router.navigate([returnUrl]);
                         }
                     } else {
+                        console.error('[AuthCallback] getCurrentUser returned null/undefined user');
                         this.showError('Failed to retrieve user information.');
                     }
                 },
                 error: (error) => {
-                    console.error('Auth callback error:', error);
+                    console.error('[AuthCallback] getCurrentUser error:', error.status, error.message, error);
                     this.showError(error.message || 'Authentication failed. Please try again.');
                 }
             });

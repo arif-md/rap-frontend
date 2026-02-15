@@ -151,16 +151,27 @@ export class Dashboard implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log('[Dashboard] ngOnInit called');
     this.authService.currentUser.subscribe((user: User | null) => {
+      console.log('[Dashboard] currentUser subscription fired:', {
+        hasUser: !!user,
+        email: user?.email,
+        isExternalUser: user?.isExternalUser,
+        roles: user?.roles
+      });
       this.currentUser = user;
       if (user) {
         if (user.isExternalUser) {
           // External user: load tasks for first tab
+          console.log('[Dashboard] External user detected, loading tasks');
           this.loadTasks();
         } else {
           // Internal user: load university list
+          console.log('[Dashboard] Internal user detected, loading universities');
           this.loadUniversities();
         }
+      } else {
+        console.log('[Dashboard] currentUser is null - dashboard will be empty');
       }
     });
   }
@@ -320,12 +331,14 @@ export class Dashboard implements OnInit {
 
   loadUniversities(): void {
     const apiBaseUrl = this.getApiBaseUrl();
+    console.log('[Dashboard] Loading universities from:', `${apiBaseUrl}/api/universities`);
     this.http.get<University[]>(`${apiBaseUrl}/api/universities`, { withCredentials: true }).subscribe({
       next: (universities) => {
+        console.log('[Dashboard] Universities loaded:', universities?.length, 'items');
         this.universities = universities;
       },
       error: (error) => {
-        console.error('Error loading universities:', error);
+        console.error('[Dashboard] Error loading universities:', error.status, error.message);
         this.handleAuthError(error);
       }
     });
