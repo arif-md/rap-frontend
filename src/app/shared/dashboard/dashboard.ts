@@ -38,7 +38,10 @@ interface Application {
   id: number;
   applicationName: string;
   applicationCode: string;
+  description?: string;
   status: string;
+  ownerName?: string;
+  ownerEmail?: string;
   createdAt: string;
 }
 
@@ -49,6 +52,13 @@ interface Permit {
   status: string;
   issueDate: string;
   expiryDate: string;
+}
+
+interface University {
+  id: number;
+  universityName: string;
+  universityCode: string;
+  status: string;
 }
 
 @Component({
@@ -96,6 +106,43 @@ export class Dashboard implements OnInit {
   // Currently selected tab index
   selectedTabIndex = 0;
 
+  // ==========================================
+  // Internal Dashboard State
+  // ==========================================
+  universities: University[] = [];
+  selectedUniversityId: number | null = null;
+
+  // Internal tab index
+  internalTabIndex = 0;
+
+  // University Applications
+  uniApplications: Application[] = [];
+  uniApplicationsPage = 0;
+  uniApplicationsSize = 10;
+  uniApplicationsTotalElements = 0;
+  uniApplicationsLoading = false;
+
+  // University Permits
+  uniPermits: Permit[] = [];
+  uniPermitsPage = 0;
+  uniPermitsSize = 10;
+  uniPermitsTotalElements = 0;
+  uniPermitsLoading = false;
+
+  // Available Tasks
+  availableTasks: Task[] = [];
+  availableTasksPage = 0;
+  availableTasksSize = 10;
+  availableTasksTotalElements = 0;
+  availableTasksLoading = false;
+
+  // My Internal Tasks
+  myInternalTasks: Task[] = [];
+  myInternalTasksPage = 0;
+  myInternalTasksSize = 10;
+  myInternalTasksTotalElements = 0;
+  myInternalTasksLoading = false;
+
   constructor(
     private authService: AuthenticationService,
     private appConfigService: AppConfigService,
@@ -106,9 +153,14 @@ export class Dashboard implements OnInit {
   ngOnInit(): void {
     this.authService.currentUser.subscribe((user: User | null) => {
       this.currentUser = user;
-      // Load initial data for first tab
       if (user) {
-        this.loadTasks();
+        if (user.isExternalUser) {
+          // External user: load tasks for first tab
+          this.loadTasks();
+        } else {
+          // Internal user: load university list
+          this.loadUniversities();
+        }
       }
     });
   }
@@ -260,5 +312,164 @@ export class Dashboard implements OnInit {
   onStartApplicationModule3(): void {
     // TODO: Implement Module 3 navigation
     console.log('Module 3 - Not yet implemented');
+  }
+
+  // ==========================================
+  // Internal Dashboard Methods
+  // ==========================================
+
+  loadUniversities(): void {
+    const apiBaseUrl = this.getApiBaseUrl();
+    this.http.get<University[]>(`${apiBaseUrl}/api/universities`, { withCredentials: true }).subscribe({
+      next: (universities) => {
+        this.universities = universities;
+      },
+      error: (error) => {
+        console.error('Error loading universities:', error);
+        this.handleAuthError(error);
+      }
+    });
+  }
+
+  onUniversityChange(): void {
+    if (!this.selectedUniversityId) return;
+    // Reset pagination for all tabs
+    this.uniApplicationsPage = 0;
+    this.uniPermitsPage = 0;
+    this.availableTasksPage = 0;
+    this.myInternalTasksPage = 0;
+    // Load data for the currently selected internal tab
+    this.loadInternalTabData(this.internalTabIndex);
+  }
+
+  onInternalTabChange(event: MatTabChangeEvent): void {
+    this.internalTabIndex = event.index;
+    this.loadInternalTabData(event.index);
+  }
+
+  private loadInternalTabData(tabIndex: number): void {
+    if (!this.selectedUniversityId) return;
+    switch (tabIndex) {
+      case 0:
+        this.loadUniApplications();
+        break;
+      case 1:
+        this.loadUniPermits();
+        break;
+      case 2:
+        this.loadAvailableTasks();
+        break;
+      case 3:
+        this.loadMyInternalTasks();
+        break;
+    }
+  }
+
+  loadUniApplications(): void {
+    if (this.uniApplicationsLoading || !this.selectedUniversityId) return;
+    this.uniApplicationsLoading = true;
+    const apiBaseUrl = this.getApiBaseUrl();
+    const url = `${apiBaseUrl}/api/applications/university/${this.selectedUniversityId}?page=${this.uniApplicationsPage}&size=${this.uniApplicationsSize}`;
+
+    this.http.get<PageResponse<Application>>(url, { withCredentials: true }).subscribe({
+      next: (response) => {
+        this.uniApplications = response.content;
+        this.uniApplicationsTotalElements = response.totalElements;
+        this.uniApplicationsLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading university applications:', error);
+        this.handleAuthError(error);
+        this.uniApplications = [];
+        this.uniApplicationsLoading = false;
+      }
+    });
+  }
+
+  loadUniPermits(): void {
+    if (this.uniPermitsLoading || !this.selectedUniversityId) return;
+    this.uniPermitsLoading = true;
+    const apiBaseUrl = this.getApiBaseUrl();
+    const url = `${apiBaseUrl}/api/permits/university/${this.selectedUniversityId}?page=${this.uniPermitsPage}&size=${this.uniPermitsSize}`;
+
+    this.http.get<PageResponse<Permit>>(url, { withCredentials: true }).subscribe({
+      next: (response) => {
+        this.uniPermits = response.content;
+        this.uniPermitsTotalElements = response.totalElements;
+        this.uniPermitsLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading university permits:', error);
+        this.handleAuthError(error);
+        this.uniPermits = [];
+        this.uniPermitsLoading = false;
+      }
+    });
+  }
+
+  loadAvailableTasks(): void {
+    if (this.availableTasksLoading) return;
+    this.availableTasksLoading = true;
+    const apiBaseUrl = this.getApiBaseUrl();
+    const url = `${apiBaseUrl}/api/workflow/tasks/available?page=${this.availableTasksPage}&size=${this.availableTasksSize}`;
+
+    this.http.get<PageResponse<Task>>(url, { withCredentials: true }).subscribe({
+      next: (response) => {
+        this.availableTasks = response.content;
+        this.availableTasksTotalElements = response.totalElements;
+        this.availableTasksLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading available tasks:', error);
+        this.handleAuthError(error);
+        this.availableTasks = [];
+        this.availableTasksLoading = false;
+      }
+    });
+  }
+
+  loadMyInternalTasks(): void {
+    if (this.myInternalTasksLoading) return;
+    this.myInternalTasksLoading = true;
+    const apiBaseUrl = this.getApiBaseUrl();
+    const url = `${apiBaseUrl}/api/workflow/tasks/my?page=${this.myInternalTasksPage}&size=${this.myInternalTasksSize}`;
+
+    this.http.get<PageResponse<Task>>(url, { withCredentials: true }).subscribe({
+      next: (response) => {
+        this.myInternalTasks = response.content;
+        this.myInternalTasksTotalElements = response.totalElements;
+        this.myInternalTasksLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading my tasks:', error);
+        this.handleAuthError(error);
+        this.myInternalTasks = [];
+        this.myInternalTasksLoading = false;
+      }
+    });
+  }
+
+  onUniApplicationsPageChange(event: PageEvent): void {
+    this.uniApplicationsPage = event.pageIndex;
+    this.uniApplicationsSize = event.pageSize;
+    this.loadUniApplications();
+  }
+
+  onUniPermitsPageChange(event: PageEvent): void {
+    this.uniPermitsPage = event.pageIndex;
+    this.uniPermitsSize = event.pageSize;
+    this.loadUniPermits();
+  }
+
+  onAvailableTasksPageChange(event: PageEvent): void {
+    this.availableTasksPage = event.pageIndex;
+    this.availableTasksSize = event.pageSize;
+    this.loadAvailableTasks();
+  }
+
+  onMyInternalTasksPageChange(event: PageEvent): void {
+    this.myInternalTasksPage = event.pageIndex;
+    this.myInternalTasksSize = event.pageSize;
+    this.loadMyInternalTasks();
   }
 }

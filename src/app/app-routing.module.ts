@@ -32,7 +32,8 @@ import {
 } from '@app/shared/model';
 
 import { DefaultPathGuard } from '@app/shared/helpers';
-import { authGuard } from '@app/shared/guards/auth.guard';
+import { authGuard, externalGuard } from '@app/shared/guards/auth.guard';
+import { UnauthorizedComponent } from '@app/shared/unauthorized/unauthorized.component';
 
 export const routes: Routes = [
 
@@ -42,11 +43,12 @@ export const routes: Routes = [
   { path: 'auth-callback', title: 'Authenticating...', component: AuthCallbackComponent },
   //{ path: PATH_LOGOUT_SUCCESS, title: LOGOUT_TITLE, component: LogoutSuccessComponent },
   //{ path: PATH_LOGIN_FAILURE, title: LOGIN_FAILURE_TITLE, component: LoginFailureComponent },
-  //{ path: UNAUTHORIZED, title: UNAUTHORIZED_TITLE, component: UnauthorizedComponent },
+  { path: UNAUTHORIZED, title: UNAUTHORIZED_TITLE, component: UnauthorizedComponent },
 
-  // Protected routes
+  // Protected routes - Dashboard uses authGuard (shows role-appropriate content based on JWT role)
   { path: PATH_DASHBOARD, title: 'Dashboard', component: Dashboard, canActivate: [authGuard] },
-  { path: 'application-form', title: 'Application Form', component: ApplicationFormComponent, canActivate: [authGuard] },
+  // Application form is for external users only
+  { path: 'application-form', title: 'Application Form', component: ApplicationFormComponent, canActivate: [externalGuard] },
 
   { path: PATH_DEFAULT, redirectTo: PATH_LANDING, pathMatch: 'full' },
   //{ path: PATH_UNSPECIFIED, component: PageNotFoundComponent }

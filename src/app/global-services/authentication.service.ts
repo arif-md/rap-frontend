@@ -354,6 +354,20 @@ export class AuthenticationService {
     }
 
     /**
+     * Check if user is an external user (based on JWT role)
+     */
+    isExternalUser(): boolean {
+        return this.hasRole('EXTERNAL_USER');
+    }
+
+    /**
+     * Check if user is an internal user (based on JWT role)
+     */
+    isInternalUser(): boolean {
+        return this.hasRole('INTERNAL_USER');
+    }
+
+    /**
      * Check if user is admin
      */
     isAdmin(): boolean {

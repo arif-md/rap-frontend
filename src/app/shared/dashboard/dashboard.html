@@ -220,15 +220,264 @@
     </div>
   </div>
 
-  <!-- Internal User Dashboard (Placeholder for future) -->
+  <!-- Internal User Dashboard -->
   <div *ngIf="!currentUser.isExternalUser" class="internal-dashboard">
-    <div class="container-fluid mt-4">
-      <div class="alert alert-info">
-        <h4>Internal User Dashboard</h4>
-        <p>Internal user dashboard will be developed in the future.</p>
-        <p><strong>User:</strong> {{ currentUser.email }}</p>
-        <p><strong>Roles:</strong> {{ currentUser.roles?.join(', ') }}</p>
+    <div class="container-fluid">
+
+      <!-- Page Title -->
+      <div class="row mt-4 mb-3">
+        <div class="col-12">
+          <h2 class="page-title">Internal Dashboard</h2>
+        </div>
       </div>
+
+      <!-- University Picklist -->
+      <div class="row mb-4">
+        <div class="col-md-6 col-lg-4">
+          <label for="universitySelect" class="form-label fw-semibold">Select University</label>
+          <select id="universitySelect"
+                  class="form-select university-select"
+                  [(ngModel)]="selectedUniversityId"
+                  (ngModelChange)="onUniversityChange()">
+            <option [ngValue]="null" disabled>-- Select a University --</option>
+            <option *ngFor="let uni of universities" [ngValue]="uni.id">
+              {{ uni.universityName }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="row" *ngIf="selectedUniversityId">
+        <div class="col-12">
+          <mat-tab-group class="custom-tabs" (selectedTabChange)="onInternalTabChange($event)">
+
+            <!-- Applications Tab -->
+            <mat-tab label="Applications">
+              <div class="tab-content-wrapper">
+                <div class="filter-section mb-3">
+                  <input type="text" class="form-control filter-input" placeholder="Filter Applications">
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <th>Application Code</th>
+                        <th>Application Name</th>
+                        <th>Owner</th>
+                        <th>Status</th>
+                        <th>Created Date</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let app of uniApplications">
+                        <td>{{ app.applicationCode }}</td>
+                        <td>{{ app.applicationName }}</td>
+                        <td>{{ app.ownerName || app.ownerEmail }}</td>
+                        <td>
+                          <span class="badge" [ngClass]="getStatusBadgeClass(app.status)">
+                            {{ app.status }}
+                          </span>
+                        </td>
+                        <td>{{ app.createdAt | date:'short' }}</td>
+                        <td>
+                          <button mat-icon-button color="primary" title="View">
+                            <mat-icon>visibility</mat-icon>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr *ngIf="(uniApplications?.length ?? 0) === 0 && !uniApplicationsLoading">
+                        <td colspan="6" class="text-center text-muted">No applications found for this university</td>
+                      </tr>
+                      <tr *ngIf="uniApplicationsLoading">
+                        <td colspan="6" class="text-center text-muted">Loading applications...</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <mat-paginator
+                  [length]="uniApplicationsTotalElements || 0"
+                  [pageSize]="uniApplicationsSize"
+                  [pageSizeOptions]="[5, 10, 25, 50]"
+                  [pageIndex]="uniApplicationsPage"
+                  (page)="onUniApplicationsPageChange($event)"
+                  showFirstLastButtons>
+                </mat-paginator>
+              </div>
+            </mat-tab>
+
+            <!-- Permits Tab -->
+            <mat-tab label="Permits">
+              <div class="tab-content-wrapper">
+                <div class="filter-section mb-3">
+                  <input type="text" class="form-control filter-input" placeholder="Filter Permits">
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <th>Permit Number</th>
+                        <th>Permit Type</th>
+                        <th>Status</th>
+                        <th>Issue Date</th>
+                        <th>Expiry Date</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let permit of uniPermits">
+                        <td>{{ permit.permitNumber }}</td>
+                        <td>{{ permit.permitType }}</td>
+                        <td>
+                          <span class="badge" [ngClass]="getStatusBadgeClass(permit.status)">
+                            {{ permit.status }}
+                          </span>
+                        </td>
+                        <td>{{ permit.issueDate | date:'shortDate' }}</td>
+                        <td>{{ permit.expiryDate | date:'shortDate' }}</td>
+                        <td>
+                          <button mat-icon-button color="primary" title="View">
+                            <mat-icon>visibility</mat-icon>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr *ngIf="(uniPermits?.length ?? 0) === 0 && !uniPermitsLoading">
+                        <td colspan="6" class="text-center text-muted">No permits found for this university</td>
+                      </tr>
+                      <tr *ngIf="uniPermitsLoading">
+                        <td colspan="6" class="text-center text-muted">Loading permits...</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <mat-paginator
+                  [length]="uniPermitsTotalElements || 0"
+                  [pageSize]="uniPermitsSize"
+                  [pageSizeOptions]="[5, 10, 25, 50]"
+                  [pageIndex]="uniPermitsPage"
+                  (page)="onUniPermitsPageChange($event)"
+                  showFirstLastButtons>
+                </mat-paginator>
+              </div>
+            </mat-tab>
+
+            <!-- Available Tasks Tab -->
+            <mat-tab label="Available Tasks">
+              <div class="tab-content-wrapper">
+                <div class="filter-section mb-3">
+                  <input type="text" class="form-control filter-input" placeholder="Filter Available Tasks">
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <th>Function</th>
+                        <th>Task</th>
+                        <th>Application Number</th>
+                        <th>Application Name (Project Title)</th>
+                        <th>Issuing Office</th>
+                        <th>Type</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let task of availableTasks">
+                        <td>{{ task.function }}</td>
+                        <td>{{ task.task }}</td>
+                        <td>{{ task.applicationNumber }}</td>
+                        <td>{{ task.applicationName }}</td>
+                        <td>{{ task.issuingOffice }}</td>
+                        <td>{{ task.type }}</td>
+                      </tr>
+                      <tr *ngIf="(availableTasks?.length ?? 0) === 0 && !availableTasksLoading">
+                        <td colspan="6" class="text-center text-muted">No available tasks</td>
+                      </tr>
+                      <tr *ngIf="availableTasksLoading">
+                        <td colspan="6" class="text-center text-muted">Loading available tasks...</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <mat-paginator
+                  [length]="availableTasksTotalElements || 0"
+                  [pageSize]="availableTasksSize"
+                  [pageSizeOptions]="[5, 10, 25, 50]"
+                  [pageIndex]="availableTasksPage"
+                  (page)="onAvailableTasksPageChange($event)"
+                  showFirstLastButtons>
+                </mat-paginator>
+              </div>
+            </mat-tab>
+
+            <!-- My Tasks Tab -->
+            <mat-tab label="My Tasks">
+              <div class="tab-content-wrapper">
+                <div class="filter-section mb-3">
+                  <input type="text" class="form-control filter-input" placeholder="Filter My Tasks">
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <th>Function</th>
+                        <th>Task</th>
+                        <th>Application Number</th>
+                        <th>Application Name (Project Title)</th>
+                        <th>Issuing Office</th>
+                        <th>Type</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let task of myInternalTasks">
+                        <td>{{ task.function }}</td>
+                        <td>{{ task.task }}</td>
+                        <td>{{ task.applicationNumber }}</td>
+                        <td>{{ task.applicationName }}</td>
+                        <td>{{ task.issuingOffice }}</td>
+                        <td>{{ task.type }}</td>
+                      </tr>
+                      <tr *ngIf="(myInternalTasks?.length ?? 0) === 0 && !myInternalTasksLoading">
+                        <td colspan="6" class="text-center text-muted">No tasks assigned to you</td>
+                      </tr>
+                      <tr *ngIf="myInternalTasksLoading">
+                        <td colspan="6" class="text-center text-muted">Loading your tasks...</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <mat-paginator
+                  [length]="myInternalTasksTotalElements || 0"
+                  [pageSize]="myInternalTasksSize"
+                  [pageSizeOptions]="[5, 10, 25, 50]"
+                  [pageIndex]="myInternalTasksPage"
+                  (page)="onMyInternalTasksPageChange($event)"
+                  showFirstLastButtons>
+                </mat-paginator>
+              </div>
+            </mat-tab>
+
+          </mat-tab-group>
+        </div>
+      </div>
+
+      <!-- Prompt if no university selected -->
+      <div class="row" *ngIf="!selectedUniversityId">
+        <div class="col-12">
+          <div class="no-university-prompt text-center text-muted py-5">
+            <mat-icon class="prompt-icon">school</mat-icon>
+            <p class="mt-3 fs-5">Please select a university to view applications, permits, and tasks.</p>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
