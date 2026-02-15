@@ -24,6 +24,7 @@ export class EnvironmentProps {
     recMapApiKey: string;
     jwtAccessTokenExpirationMinutes?: number;
     jwtRefreshTokenExpirationDays?: number;
+    enableKeycloakInternal?: boolean;
 }
 
 @Injectable({
@@ -53,6 +54,7 @@ export class EnvironmentPropsAdapter implements Rest2Form<EnvironmentProps> {
         result.palMapApiKey = item.palMapApiKey;
         result.jwtAccessTokenExpirationMinutes = item.jwtAccessTokenExpirationMinutes;
         result.jwtRefreshTokenExpirationDays = item.jwtRefreshTokenExpirationDays;
+        result.enableKeycloakInternal = item.enableKeycloakInternal || false;
         return result;
     }
 }

@@ -50,13 +50,17 @@ export class AuthCallbackComponent implements OnInit {
     errorMessage = '';
 
     ngOnInit(): void {
-        // The backend handles the OIDC callback and sets cookies
-        // We just need to fetch the current user and redirect
+        // The backend handles the OIDC/Azure AD callback and sets cookies
+        // We fetch the current user and redirect based on the provider
         this.processCallback();
     }
 
     private async processCallback(): Promise<void> {
         try {
+            // Check if this was an internal user login (Azure AD SSO or Keycloak Internal)
+            const provider = this.route.snapshot.queryParams['provider'];
+            const isInternalLogin = provider === 'azure-ad' || provider === 'keycloak-internal';
+
             // Wait a moment for cookies to be set
             await new Promise(resolve => setTimeout(resolve, 500));
             
@@ -64,9 +68,16 @@ export class AuthCallbackComponent implements OnInit {
             this.authService.getCurrentUser().subscribe({
                 next: (user) => {
                     if (user) {
-                        // Get return URL or default to dashboard
-                        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
-                        this.router.navigate([returnUrl]);
+                        if (isInternalLogin) {
+                            // Internal user (Azure AD SSO or Keycloak Internal) → navigate to internal dashboard
+                            console.log('[AuthCallback] Internal login detected (provider: ' + provider + '), navigating to dashboard (internal)');
+                            this.router.navigate(['/dashboard'], { queryParams: { view: 'internal' } });
+                        } else {
+                            // External OIDC user → navigate to dashboard (default external view)
+                            const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+                            console.log('[AuthCallback] OIDC login detected, navigating to:', returnUrl);
+                            this.router.navigate([returnUrl]);
+                        }
                     } else {
                         this.showError('Failed to retrieve user information.');
                     }

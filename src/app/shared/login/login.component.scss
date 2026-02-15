@@ -24,3 +24,57 @@ a:active {
   min-height: 4em;
   white-space: normal !important;
 }
+
+.sso-button {
+  background-color: #fff !important;
+  color: #5e5e5e !important;
+  border: 1px solid #8c8c8c !important;
+  
+  &:hover:not(:disabled) {
+    background-color: #f5f5f5 !important;
+    border-color: #5e5e5e !important;
+  }
+
+  &:disabled {
+    opacity: 0.65;
+  }
+}
+
+.ms-icon {
+  height: 20px;
+  width: 20px;
+  vertical-align: middle;
+}
+
+.divider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.divider-line {
+  flex: 1;
+  border-top: 1px solid #dee2e6;
+  margin: 0;
+}
+
+.divider-text {
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.internal-button {
+  background-color: #e8f5e9 !important;
+  color: #2e7d32 !important;
+  border: 1px solid #81c784 !important;
+  
+  &:hover:not(:disabled) {
+    background-color: #c8e6c9 !important;
+    border-color: #2e7d32 !important;
+  }
+
+  &:disabled {
+    opacity: 0.65;
+  }
+}

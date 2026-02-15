@@ -34,7 +34,7 @@
                             class="login-button"
                             (click)="login()"
                             [disabled]="isLoading">
-                            @if (isLoading) {
+                            @if (isLoading && loadingProvider === 'oidc') {
                                 <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                                 Redirecting to OIDC Provider...
                             } @else {
@@ -42,6 +42,47 @@
                                 Sign in with OIDC Provider
                             }
                         </button>
+
+                        <div class="divider-row my-2">
+                            <hr class="divider-line"><span class="divider-text text-muted">OR</span><hr class="divider-line">
+                        </div>
+
+                        <button
+                            mat-raised-button
+                            type="button"
+                            class="login-button sso-button"
+                            (click)="ssoLogin()"
+                            [disabled]="isLoading">
+                            @if (isLoading && loadingProvider === 'sso') {
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Redirecting to Microsoft...
+                            } @else {
+                                <img src="assets/icons/microsoft-logo.svg" alt="Microsoft" class="ms-icon me-2" onerror="this.style.display='none'">
+                                <i class="bi bi-microsoft me-2" style="display:none"></i>
+                                Sign in with Microsoft (SSO)
+                            }
+                        </button>
+
+                        @if (enableKeycloakInternal) {
+                            <div class="divider-row my-2">
+                                <hr class="divider-line"><span class="divider-text text-muted">OR</span><hr class="divider-line">
+                            </div>
+
+                            <button
+                                mat-raised-button
+                                type="button"
+                                class="login-button internal-button"
+                                (click)="internalLogin()"
+                                [disabled]="isLoading">
+                                @if (isLoading && loadingProvider === 'internal') {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    Redirecting to Keycloak...
+                                } @else {
+                                    <i class="bi bi-person-badge me-2"></i>
+                                    Sign in as Internal User (Keycloak)
+                                }
+                            </button>
+                        }
                     </div>
                 </div>
             </div>
@@ -51,11 +92,16 @@
                     <div class="col">
                         <p class="mb-2">
                             <i class="bi bi-info-circle me-2"></i>
-                            You need an OIDC account to access RAPTOR.
+                            You need an OIDC account or a Microsoft organizational account to access RAPTOR.
                         </p>
                         <p class="mb-0 text-muted small">
-                            Click the button above to sign in or create an account with your OIDC provider. 
-                            Once authenticated, you will be redirected back to RAPTOR.
+                            <strong>External users:</strong> Click "Sign in with OIDC Provider" to authenticate with your OIDC provider.
+                            <br>
+                            <strong>Internal users:</strong> Click "Sign in with Microsoft (SSO)" to use your organizational account.
+                            @if (enableKeycloakInternal) {
+                                <br>
+                                <strong>Internal users (offline):</strong> Click "Sign in as Internal User (Keycloak)" for local development without internet.
+                            }
                         </p>
                     </div>
                 </div>

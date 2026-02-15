@@ -137,7 +137,7 @@ export class AuthenticationService {
     }
 
     /**
-     * Redirect to OIDC provider for authentication
+     * Redirect to OIDC provider for authentication (external users)
      */
     async redirectToLogin(): Promise<void> {
         try {
@@ -153,6 +153,48 @@ export class AuthenticationService {
             window.location.href = authUrl;
         } catch (error) {
             console.error('Failed to get login URL:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Redirect to Azure Entra ID for SSO authentication (internal users)
+     */
+    async redirectToSsoLogin(): Promise<void> {
+        try {
+            const apiBaseUrl = this.appConfigService.envProperties?.apiBaseUrl || 'http://localhost:8080';
+            const response = await firstValueFrom(
+                this.http.get<{ authorizationUrl: string; message: string }>(`${apiBaseUrl}/auth/sso-login`, httpOptions)
+            );
+            // Construct full URL - backend returns relative path
+            const backendBaseUrl = apiBaseUrl;
+            const authUrl = response.authorizationUrl.startsWith('http')
+                ? response.authorizationUrl
+                : backendBaseUrl + response.authorizationUrl;
+            window.location.href = authUrl;
+        } catch (error) {
+            console.error('Failed to get SSO login URL:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Redirect to Keycloak for internal user authentication (offline local development)
+     * Only available when ENABLE_KEYCLOAK_INTERNAL=true on the backend.
+     */
+    async redirectToInternalLogin(): Promise<void> {
+        try {
+            const apiBaseUrl = this.appConfigService.envProperties?.apiBaseUrl || 'http://localhost:8080';
+            const response = await firstValueFrom(
+                this.http.get<{ authorizationUrl: string; message: string }>(`${apiBaseUrl}/auth/internal-login`, httpOptions)
+            );
+            const backendBaseUrl = apiBaseUrl;
+            const authUrl = response.authorizationUrl.startsWith('http')
+                ? response.authorizationUrl
+                : backendBaseUrl + response.authorizationUrl;
+            window.location.href = authUrl;
+        } catch (error) {
+            console.error('Failed to get internal login URL:', error);
             throw error;
         }
     }
