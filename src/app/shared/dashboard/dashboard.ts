@@ -42,6 +42,8 @@ interface Application {
   status: string;
   ownerName?: string;
   ownerEmail?: string;
+  universityId?: number;
+  universityName?: string;
   createdAt: string;
 }
 
@@ -52,6 +54,8 @@ interface Permit {
   status: string;
   issueDate: string;
   expiryDate: string;
+  universityId?: number;
+  universityName?: string;
 }
 
 interface University {

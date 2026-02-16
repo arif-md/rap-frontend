@@ -106,6 +106,7 @@
                       <tr>
                         <th>Application Code</th>
                         <th>Application Name</th>
+                        <th>University</th>
                         <th>Status</th>
                         <th>Created Date</th>
                         <th>Actions</th>
@@ -115,6 +116,7 @@
                       <tr *ngFor="let app of myApplications">
                         <td>{{ app.applicationCode }}</td>
                         <td>{{ app.applicationName }}</td>
+                        <td>{{ app.universityName || '-' }}</td>
                         <td>
                           <span class="badge" [ngClass]="getStatusBadgeClass(app.status)">
                             {{ app.status }}
@@ -131,10 +133,10 @@
                         </td>
                       </tr>
                       <tr *ngIf="(myApplications?.length ?? 0) === 0 && !applicationsLoading">
-                        <td colspan="5" class="text-center text-muted">No applications found</td>
+                        <td colspan="6" class="text-center text-muted">No applications found</td>
                       </tr>
                       <tr *ngIf="applicationsLoading">
-                        <td colspan="5" class="text-center text-muted">Loading applications...</td>
+                        <td colspan="6" class="text-center text-muted">Loading applications...</td>
                       </tr>
                     </tbody>
                   </table>
@@ -165,6 +167,7 @@
                       <tr>
                         <th>Permit Number</th>
                         <th>Permit Type</th>
+                        <th>University</th>
                         <th>Status</th>
                         <th>Issue Date</th>
                         <th>Expiry Date</th>
@@ -175,6 +178,7 @@
                       <tr *ngFor="let permit of myPermits">
                         <td>{{ permit.permitNumber }}</td>
                         <td>{{ permit.permitType }}</td>
+                        <td>{{ permit.universityName || '-' }}</td>
                         <td>
                           <span class="badge" [ngClass]="getStatusBadgeClass(permit.status)">
                             {{ permit.status }}
@@ -192,10 +196,10 @@
                         </td>
                       </tr>
                       <tr *ngIf="(myPermits?.length ?? 0) === 0 && !permitsLoading">
-                        <td colspan="6" class="text-center text-muted">No permits found</td>
+                        <td colspan="7" class="text-center text-muted">No permits found</td>
                       </tr>
                       <tr *ngIf="permitsLoading">
-                        <td colspan="6" class="text-center text-muted">Loading permits...</td>
+                        <td colspan="7" class="text-center text-muted">Loading permits...</td>
                       </tr>
                     </tbody>
                   </table>
