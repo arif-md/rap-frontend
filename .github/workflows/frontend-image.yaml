@@ -6,9 +6,11 @@ on:
     branches: [ main ]
     paths:
       - 'Dockerfile'
+      - 'docker-entrypoint.sh'
       - 'package.json'
       - 'angular.json'
       - 'src/**'
+      - 'scripts/**'
 
 env:
   AZURE_ACR_NAME: ${{ vars.AZURE_ACR_NAME }}
