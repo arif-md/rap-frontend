@@ -16,14 +16,16 @@ else
     # Fallback: Create basic runtime config
     mkdir -p "$(dirname "$RUNTIME_JSON_PATH")"
     
+    # NOTE: jwtAccessTokenExpirationMinutes and jwtRefreshTokenExpirationDays are intentionally
+    # omitted so the Angular app fetches them dynamically from the backend's
+    # /api/config/environmentProperties endpoint (which has @RefreshScope and reflects live
+    # App Config values without requiring a container restart).
     cat > "$RUNTIME_JSON_PATH" <<EOF
 {
   "appEnv": "${AZURE_ENV_NAME:-local}",
   "appEnvName": "${AZURE_ENV_NAME:-Local}",
   "buildVersion": "${APP_VERSION:-0.0.1-SNAPSHOT}",
   "apiBaseUrl": "${API_BASE_URL:-http://localhost:8080}",
-  "jwtAccessTokenExpirationMinutes": ${JWT_ACCESS_TOKEN_EXPIRATION_MINUTES:-15},
-  "jwtRefreshTokenExpirationDays": ${JWT_REFRESH_TOKEN_EXPIRATION_DAYS:-7},
   "_runtimeGenerated": true,
   "_generatedAt": "$(date -Iseconds)",
   "_fallbackMode": true

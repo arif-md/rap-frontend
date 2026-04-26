@@ -17,13 +17,15 @@ function mergeRuntimeConfig(outputPath) {
     outputPath = outputPath || '/usr/share/nginx/html/assets/runtime-config.json';
     
     // Runtime environment configuration (takes precedence)
+    // NOTE: jwtAccessTokenExpirationMinutes and jwtRefreshTokenExpirationDays are intentionally
+    // omitted here so the Angular app fetches them dynamically from the backend
+    // /api/config/environmentProperties endpoint (which has @RefreshScope and reflects live
+    // App Config values without requiring a container restart).
     const runtimeConfig = {
         appEnv: process.env.AZURE_ENV_NAME || 'local',
         appEnvName: process.env.AZURE_ENV_NAME || 'Local',
         buildVersion: process.env.APP_VERSION || '0.0.1-SNAPSHOT',
         apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:8080',
-        jwtAccessTokenExpirationMinutes: parseInt(process.env.JWT_ACCESS_TOKEN_EXPIRATION_MINUTES || '15', 10),
-        jwtRefreshTokenExpirationDays: parseInt(process.env.JWT_REFRESH_TOKEN_EXPIRATION_DAYS || '7', 10),
         _runtimeGenerated: true,
         _generatedAt: new Date().toISOString()
     };
