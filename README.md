@@ -15,6 +15,7 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 - **[Version Management](VERSION_MANAGEMENT.md)** - Build versioning and runtime config
 - **[Frontend OIDC Implementation](FRONTEND-OIDC-IMPLEMENTATION.md)** - Authentication setup
 - **[Dev Script Guide](FRONTEND-DEV-SCRIPT.md)** - Using `dev.ps1` helper scripts
+- **[Claude Code Automation](CLAUDE-AUTOMATION.md)** - How `@claude` issue-to-PR automation works, and our implement → PR → test standard
 
 ---
 
