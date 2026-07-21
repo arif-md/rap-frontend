@@ -55,25 +55,59 @@
   // Custom Tab Styling
   .custom-tabs {
     ::ng-deep {
+      // Hide the default ink-bar underline indicator; the active tab now
+      // gets its own distinct "raised" styling instead.
+      .mdc-tab-indicator {
+        display: none;
+      }
+
       .mat-mdc-tab-labels {
-        background-color: #f8f9fa;
+        background-color: #e9ecef;
         border-bottom: 2px solid #dee2e6;
+        gap: 2px;
       }
 
       .mat-mdc-tab {
         min-width: 120px;
         font-weight: 500;
         color: #6c757d;
+        background-color: #e9ecef;
+        opacity: 0.75;
+        border: 1px solid transparent;
+        border-bottom: none;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        margin-bottom: -2px;
+        transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
 
+        &:hover:not(.mdc-tab--active) {
+          background-color: #f1f3f5;
+          opacity: 1;
+        }
+
+        // Active tab: raised, "in front" of the other tabs and blended
+        // with the white content area directly below it.
         &.mdc-tab--active {
+          background-color: #ffffff;
+          opacity: 1;
+          border: 1px solid #dee2e6;
+          border-bottom: 2px solid #ffffff;
+          box-shadow: 0 -3px 6px rgba(0, 0, 0, 0.08);
+          position: relative;
+          z-index: 1;
+
           .mdc-tab__text-label {
             color: #007bff;
+            font-weight: 700;
           }
         }
       }
 
       .mat-mdc-tab-body-wrapper {
         background: white;
+        border: 1px solid #dee2e6;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
       }
     }
   }
@@ -194,25 +228,59 @@
   // Reuse same tab styling as external
   .custom-tabs {
     ::ng-deep {
+      // Hide the default ink-bar underline indicator; the active tab now
+      // gets its own distinct "raised" styling instead.
+      .mdc-tab-indicator {
+        display: none;
+      }
+
       .mat-mdc-tab-labels {
-        background-color: #f8f9fa;
+        background-color: #e9ecef;
         border-bottom: 2px solid #dee2e6;
+        gap: 2px;
       }
 
       .mat-mdc-tab {
         min-width: 120px;
         font-weight: 500;
         color: #6c757d;
+        background-color: #e9ecef;
+        opacity: 0.75;
+        border: 1px solid transparent;
+        border-bottom: none;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        margin-bottom: -2px;
+        transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
 
+        &:hover:not(.mdc-tab--active) {
+          background-color: #f1f3f5;
+          opacity: 1;
+        }
+
+        // Active tab: raised, "in front" of the other tabs and blended
+        // with the white content area directly below it.
         &.mdc-tab--active {
+          background-color: #ffffff;
+          opacity: 1;
+          border: 1px solid #dee2e6;
+          border-bottom: 2px solid #ffffff;
+          box-shadow: 0 -3px 6px rgba(0, 0, 0, 0.08);
+          position: relative;
+          z-index: 1;
+
           .mdc-tab__text-label {
             color: #007bff;
+            font-weight: 700;
           }
         }
       }
 
       .mat-mdc-tab-body-wrapper {
         background: white;
+        border: 1px solid #dee2e6;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
       }
     }
   }
