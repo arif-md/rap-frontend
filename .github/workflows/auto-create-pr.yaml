@@ -1,0 +1,28 @@
+name: Auto-create PR for Claude branches
+
+on:
+  push:
+    branches:
+      - 'claude/**'
+
+jobs:
+  open-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Create PR if one doesn't already exist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          EXISTING=$(gh pr list --head "$BRANCH" --base development --state open --json number --jq 'length')
+          if [ "$EXISTING" = "0" ]; then
+            gh pr create --base development --head "$BRANCH" --title "Claude: $BRANCH" --fill
+          else
+            echo "PR already exists for $BRANCH, skipping."
+          fi

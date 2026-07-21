@@ -33,6 +33,31 @@ This mirrors the pattern most teams converge on when using coding agents in CI, 
 - **Re-triggering Claude to fix a failure is an explicit human decision**, not an automatic loop. This keeps a person deciding, case by case, whether a CI failure is worth asking Claude to retry, or whether the underlying issue description needs to be rewritten, or whether it's faster for a person to just fix it directly.
 - **Branch protection makes the "must pass" requirement structural**, not just a convention — see below.
 
+## Automatic PR creation (bot-authored)
+
+`claude-code-action` deliberately does not open PRs itself — it posts a "Create PR" link that a human must click, by design, so a human always stays in the loop. On a personal/solo-maintainer repo this creates a specific problem: if the repo owner clicks that link, they become the PR author, and GitHub does not allow an author to approve their own PR, which blocks the required-review branch protection rule.
+
+`.github/workflows/auto-create-pr.yaml` solves this by listening for any push to a `claude/**` branch and opening the PR automatically using the GitHub Actions bot identity (`github-actions[bot]`), rather than a human clicking the link. Because the bot — not the repo owner — is the PR author, the owner is a genuinely separate identity and can review and approve the PR normally.
+
+Updated flow:
+
+1. `@claude` comment → Claude implements the change on a `claude/issue-N-...` branch
+2. `auto-create-pr.yaml` fires on that push → opens a PR into `development`, authored by `github-actions[bot]`
+3. `build-test.yaml` runs CI (build, lint, test) on the PR
+4. `CODEOWNERS` auto-requests the repo owner as reviewer
+5. The repo owner reviews the diff and CI result, approves, and merges into `development`
+6. `development` is promoted to `main` on the team's normal release cadence (manual, unchanged)
+
+This requires **Settings → Actions → General → Workflow permissions → Read and write permissions** to be enabled, since the default `GITHUB_TOKEN` needs write access to open pull requests.
+
+## One branch per issue
+
+Claude names each branch after the GitHub issue number it was triggered from (e.g. `claude/issue-14-20260721-1439`). This means:
+- **A new issue** always gets its own new branch.
+- **A follow-up `@claude` comment on the same issue** (e.g. asking Claude to fix a failing test or adjust the implementation) reuses that issue's existing branch and PR, pushing new commits to it rather than opening a duplicate.
+
+This is the action's built-in convention — no extra configuration is required to keep issues isolated from one another. It relies on the request being tied to an actual GitHub issue; a PR comment unrelated to any issue does not get this same issue-number-based branch naming.
+
 ## Writing good issues for Claude
 
 Vague issues produce vague implementations. Issues that work well:
