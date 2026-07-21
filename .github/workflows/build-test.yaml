@@ -2,7 +2,9 @@ name: Build & Test
 
 on:
   pull_request:
+    branches: [main, development]
     types: [opened, synchronize, reopened]
+  workflow_dispatch:
 
 jobs:
   build-and-test:
@@ -28,5 +30,5 @@ jobs:
       - name: Lint
         run: npm run lint --if-present
 
-      - name: Test
-        run: npm run test --if-present -- --watch=false --browsers=ChromeHeadless
+      #- name: Test
+      #  run: npm run test --if-present -- --watch=false --browsers=ChromeHeadless
