@@ -124,7 +124,11 @@
                         </td>
                         <td>{{ app.createdAt | date:'short' }}</td>
                         <td>
-                          <button mat-icon-button color="primary" title="View">
+                          <button mat-icon-button
+                                  color="primary"
+                                  title="Actions"
+                                  [matMenuTriggerFor]="myAppActionsMenu"
+                                  [matMenuTriggerData]="{ application: app }">
                             <mat-icon>visibility</mat-icon>
                           </button>
                           <button mat-icon-button color="accent" title="Edit" *ngIf="app.status === 'DRAFT'">
@@ -151,6 +155,16 @@
                   (page)="onApplicationsPageChange($event)"
                   showFirstLastButtons>
                 </mat-paginator>
+
+                <!-- Actions context menu for the eye icon -->
+                <mat-menu #myAppActionsMenu="matMenu">
+                  <ng-template matMenuContent let-application="application">
+                    <button mat-menu-item (click)="onViewApplication(application)">
+                      <mat-icon>visibility</mat-icon>
+                      <span>View Application</span>
+                    </button>
+                  </ng-template>
+                </mat-menu>
               </div>
             </mat-tab>
 
@@ -287,7 +301,11 @@
                         </td>
                         <td>{{ app.createdAt | date:'short' }}</td>
                         <td>
-                          <button mat-icon-button color="primary" title="View">
+                          <button mat-icon-button
+                                  color="primary"
+                                  title="Actions"
+                                  [matMenuTriggerFor]="uniAppActionsMenu"
+                                  [matMenuTriggerData]="{ application: app }">
                             <mat-icon>visibility</mat-icon>
                           </button>
                         </td>
@@ -310,6 +328,16 @@
                   (page)="onUniApplicationsPageChange($event)"
                   showFirstLastButtons>
                 </mat-paginator>
+
+                <!-- Actions context menu for the eye icon -->
+                <mat-menu #uniAppActionsMenu="matMenu">
+                  <ng-template matMenuContent let-application="application">
+                    <button mat-menu-item (click)="onViewApplication(application)">
+                      <mat-icon>visibility</mat-icon>
+                      <span>View Application</span>
+                    </button>
+                  </ng-template>
+                </mat-menu>
               </div>
             </mat-tab>
 

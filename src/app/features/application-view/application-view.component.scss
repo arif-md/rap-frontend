@@ -1,0 +1,112 @@
+.application-view-wrapper {
+  min-height: 100vh;
+  padding: 1.5rem;
+  background-image: url('/assets/img/bgnd-banner-topo.jpg');
+  background-repeat: no-repeat;
+  background-color: black;
+  background-size: cover;
+  background-position: center;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 30px;
+  background: #ffffff;
+  padding: 2rem;
+  border: 3px solid #F4DEA6;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.page-subtitle {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 0;
+}
+
+.application-card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  margin-bottom: 5rem;
+  border: 3px solid #F4DEA6;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: #444;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.detail-row {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+}
+
+.detail-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 4px;
+}
+
+.detail-value {
+  font-size: 16px;
+  color: #333;
+}
+
+.description-value {
+  white-space: pre-wrap;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.dashboard-button {
+  min-width: 150px;
+}
+
+.alert {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.alert-icon {
+  margin-right: 10px;
+}
+
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 24px;
+  }
+
+  .form-actions {
+    button {
+      width: 100%;
+    }
+  }
+}

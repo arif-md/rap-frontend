@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { FormsModule } from '@angular/forms';
 import { AuthenticationService, AppConfigService } from '@app/global-services';
@@ -76,6 +77,7 @@ interface University {
     MatIconModule,
     MatTableModule,
     MatChipsModule,
+    MatMenuModule,
     MatPaginatorModule
   ],
   templateUrl: './dashboard.html',
@@ -312,6 +314,11 @@ export class Dashboard implements OnInit {
       default:
         return 'bg-info';
     }
+  }
+
+  // Actions menu (eye icon) on an application row
+  onViewApplication(application: Application): void {
+    this.router.navigate(['/application-view', application.id]);
   }
 
   // Navigation methods for module buttons

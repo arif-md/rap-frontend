@@ -5,6 +5,7 @@ import { LoginComponent } from '@app/shared/login/login.component';
 import { AuthCallbackComponent } from '@app/shared/auth-callback/auth-callback.component';
 import { Dashboard } from '@app/shared/dashboard/dashboard';
 import { ApplicationFormComponent } from '@app/features/application-form/application-form.component';
+import { ApplicationViewComponent } from '@app/features/application-view/application-view.component';
 
 import {
     LANDING_TITLE,
@@ -49,6 +50,8 @@ export const routes: Routes = [
   { path: PATH_DASHBOARD, title: 'Dashboard', component: Dashboard, canActivate: [authGuard] },
   // Application form is for external users only
   { path: 'application-form', title: 'Application Form', component: ApplicationFormComponent, canActivate: [externalGuard] },
+  // Read-only application view, reached from the dashboard's "View Application" action
+  { path: 'application-view/:id', title: 'View Application', component: ApplicationViewComponent, canActivate: [authGuard] },
 
   { path: PATH_DEFAULT, redirectTo: PATH_LANDING, pathMatch: 'full' },
   //{ path: PATH_UNSPECIFIED, component: PageNotFoundComponent }

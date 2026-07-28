@@ -1,0 +1,93 @@
+<div class="bg-org-topo application-view-wrapper">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-md-10">
+
+        <!-- Page Header -->
+        <div class="page-header mt-4 mb-4">
+          <h2 class="page-title">Application Details</h2>
+          <p class="page-subtitle">Viewing application in read-only mode</p>
+        </div>
+
+        <!-- Loading -->
+        <div class="text-center py-5" *ngIf="isLoading">
+          <mat-spinner diameter="40" class="mx-auto"></mat-spinner>
+        </div>
+
+        <!-- Error Alert -->
+        <div class="alert alert-danger" *ngIf="errorMessage" role="alert">
+          <mat-icon class="alert-icon">error</mat-icon>
+          {{ errorMessage }}
+        </div>
+
+        <!-- Application Details Card -->
+        <mat-card class="application-card" *ngIf="!isLoading && application">
+          <mat-card-content>
+
+            <div class="detail-row">
+              <span class="detail-label">Application Name / Project Title</span>
+              <span class="detail-value">{{ application.applicationName }}</span>
+            </div>
+
+            <div class="detail-row">
+              <span class="detail-label">Application Code</span>
+              <span class="detail-value">{{ application.applicationCode }}</span>
+            </div>
+
+            <div class="detail-row">
+              <span class="detail-label">Status</span>
+              <span class="detail-value">{{ application.status }}</span>
+            </div>
+
+            <div class="detail-row">
+              <span class="detail-label">University</span>
+              <span class="detail-value">{{ application.universityName || '-' }}</span>
+            </div>
+
+            <h3 class="section-title">Applicant Information</h3>
+
+            <div class="detail-row">
+              <span class="detail-label">Owner Name</span>
+              <span class="detail-value">{{ application.ownerName || '-' }}</span>
+            </div>
+
+            <div class="detail-row">
+              <span class="detail-label">Owner Email</span>
+              <span class="detail-value">{{ application.ownerEmail || '-' }}</span>
+            </div>
+
+            <h3 class="section-title">Additional Information</h3>
+
+            <div class="detail-row description-row">
+              <span class="detail-label">Description</span>
+              <span class="detail-value description-value">{{ application.description || '-' }}</span>
+            </div>
+
+            <div class="detail-row">
+              <span class="detail-label">Created</span>
+              <span class="detail-value">{{ application.createdAt | date:'medium' }}{{ application.createdBy ? ' by ' + application.createdBy : '' }}</span>
+            </div>
+
+            <div class="detail-row" *ngIf="application.updatedAt">
+              <span class="detail-label">Last Updated</span>
+              <span class="detail-value">{{ application.updatedAt | date:'medium' }}{{ application.updatedBy ? ' by ' + application.updatedBy : '' }}</span>
+            </div>
+
+            <!-- Actions -->
+            <div class="form-actions">
+              <button mat-raised-button
+                      color="primary"
+                      type="button"
+                      class="dashboard-button"
+                      (click)="onDashboard()">
+                Dashboard
+              </button>
+            </div>
+
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+    </div>
+  </div>
+</div>
