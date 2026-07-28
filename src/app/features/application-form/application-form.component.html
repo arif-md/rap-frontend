@@ -15,6 +15,12 @@
           {{ errorMessage }}
         </div>
 
+        <!-- Success Alert -->
+        <div class="alert alert-success" *ngIf="successMessage" role="status">
+          <mat-icon class="alert-icon">check_circle</mat-icon>
+          {{ successMessage }}
+        </div>
+
         <!-- Application Form Card -->
         <mat-card class="application-card">
           <mat-card-content>
@@ -135,19 +141,29 @@
 
               <!-- Form Actions -->
               <div class="form-actions">
-                <button mat-raised-button 
+                <button mat-raised-button
                         type="button"
                         class="cancel-button"
                         (click)="onCancel()"
-                        [disabled]="isSubmitting">
+                        [disabled]="isSubmitting || isSaving">
                   Cancel
                 </button>
-                
-                <button mat-raised-button 
+
+                <button mat-raised-button
+                        type="button"
+                        class="save-button"
+                        (click)="onSave()"
+                        [disabled]="isSubmitting || isSaving">
+                  <mat-spinner *ngIf="isSaving" diameter="20" class="button-spinner"></mat-spinner>
+                  <span *ngIf="!isSaving">Save</span>
+                  <span *ngIf="isSaving">Saving...</span>
+                </button>
+
+                <button mat-raised-button
                         color="primary"
                         type="submit"
                         class="submit-button"
-                        [disabled]="isSubmitting">
+                        [disabled]="isSubmitting || isSaving">
                   <mat-spinner *ngIf="isSubmitting" diameter="20" class="button-spinner"></mat-spinner>
                   <span *ngIf="!isSubmitting">Submit Application</span>
                   <span *ngIf="isSubmitting">Submitting...</span>

@@ -15,6 +15,7 @@ import { SuccessDialogComponent } from './success-dialog/success-dialog.componen
 import { AuthenticationService } from '@app/global-services';
 
 export interface ApplicationSubmissionRequest {
+  applicationId?: number;
   applicationName: string;
   university: string;
   firstName: string;
@@ -45,7 +46,10 @@ export interface ApplicationSubmissionRequest {
 export class ApplicationFormComponent implements OnInit {
   applicationForm!: FormGroup;
   isSubmitting = false;
+  isSaving = false;
   errorMessage: string | null = null;
+  successMessage: string | null = null;
+  applicationId: number | null = null;
 
   universities = [
     'Harvard University',
@@ -112,21 +116,57 @@ export class ApplicationFormComponent implements OnInit {
     if (this.applicationForm.invalid) {
       this.markFormGroupTouched(this.applicationForm);
       this.errorMessage = 'Please fill in all required fields correctly.';
+      this.successMessage = null;
       return;
     }
 
     this.isSubmitting = true;
     this.errorMessage = null;
+    this.successMessage = null;
 
-    const request: ApplicationSubmissionRequest = this.applicationForm.value;
+    const request: ApplicationSubmissionRequest = {
+      ...this.applicationForm.value,
+      applicationId: this.applicationId ?? undefined
+    };
 
     this.applicationService.submitApplication(request).subscribe({
       next: (response) => {
         this.isSubmitting = false;
+        this.applicationId = response.applicationId;
         this.openSuccessDialog(response.applicationCode);
       },
       error: (error) => {
         this.isSubmitting = false;
+        this.handleError(error);
+      }
+    });
+  }
+
+  onSave(): void {
+    if (this.applicationForm.invalid) {
+      this.markFormGroupTouched(this.applicationForm);
+      this.errorMessage = 'Please fill in all required fields correctly.';
+      this.successMessage = null;
+      return;
+    }
+
+    this.isSaving = true;
+    this.errorMessage = null;
+    this.successMessage = null;
+
+    const request: ApplicationSubmissionRequest = {
+      ...this.applicationForm.value,
+      applicationId: this.applicationId ?? undefined
+    };
+
+    this.applicationService.saveApplication(request).subscribe({
+      next: (response) => {
+        this.isSaving = false;
+        this.applicationId = response.applicationId;
+        this.successMessage = `Application saved successfully. Application Number: ${response.applicationCode}`;
+      },
+      error: (error) => {
+        this.isSaving = false;
         this.handleError(error);
       }
     });
@@ -152,6 +192,7 @@ export class ApplicationFormComponent implements OnInit {
   }
 
   private handleError(error: any): void {
+    this.successMessage = null;
     if (error.error && typeof error.error === 'object') {
       // Validation errors
       const errors = Object.values(error.error).join(', ');

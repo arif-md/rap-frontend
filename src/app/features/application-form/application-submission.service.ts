@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { AppConfigService } from '@app/global-services';
 
 export interface ApplicationSubmissionRequest {
+  applicationId?: number;
   applicationName: string;
   university: string;
   firstName: string;
@@ -39,7 +40,19 @@ export class ApplicationSubmissionService {
    */
   submitApplication(request: ApplicationSubmissionRequest): Observable<ApplicationSubmissionResponse> {
     const url = `${this.baseUrl}/api/applications/submissions`;
-    
+
+    return this.http.post<ApplicationSubmissionResponse>(url, request);
+  }
+
+  /**
+   * Save an application without starting/advancing beyond intake.
+   * Safe to call repeatedly; pass back `applicationId` from a prior response to update
+   * the same application instead of creating a new one.
+   * Token authentication is automatically handled by HTTP interceptor.
+   */
+  saveApplication(request: ApplicationSubmissionRequest): Observable<ApplicationSubmissionResponse> {
+    const url = `${this.baseUrl}/api/applications/submissions/save`;
+
     return this.http.post<ApplicationSubmissionResponse>(url, request);
   }
 }
