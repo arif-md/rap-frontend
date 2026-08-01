@@ -41,7 +41,7 @@
       <!-- Tabs for Action Needed, My Applications, My Permits -->
       <div class="row">
         <div class="col-12">
-          <mat-tab-group class="custom-tabs" (selectedTabChange)="onTabChange($event)">
+          <mat-tab-group class="custom-tabs" [selectedIndex]="selectedTabIndex" (selectedTabChange)="onTabChange($event)">
             
             <!-- Action Needed Tab -->
             <mat-tab label="Action Needed">
@@ -58,18 +58,28 @@
                         <th>Task</th>
                         <th>Application Number</th>
                         <th>Application Name (Project Title)</th>
-                        <th>Issuing Office</th>
+                        <th>University</th>
                         <th>Type</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr *ngFor="let task of actionNeededTasks">
-                        <td>{{ task.function }}</td>
-                        <td>{{ task.task }}</td>
+                        <td>
+                          <button mat-raised-button
+                                  color="primary"
+                                  class="complete-task-button"
+                                  [disabled]="!task.applicationId"
+                                  [matTooltip]="!task.applicationId ? 'This task is not linked to an application record' : ''"
+                                  (click)="onOpenTask(task)">
+                            <mat-icon>task_alt</mat-icon>
+                            Complete
+                          </button>
+                        </td>
+                        <td>{{ task.name }}</td>
                         <td>{{ task.applicationNumber }}</td>
                         <td>{{ task.applicationName }}</td>
                         <td>{{ task.issuingOffice }}</td>
-                        <td>{{ task.type }}</td>
+                        <td>{{ task.processName }}</td>
                       </tr>
                       <tr *ngIf="(actionNeededTasks?.length ?? 0) === 0 && !tasksLoading">
                         <td colspan="6" class="text-center text-muted">No tasks requiring action</td>
@@ -163,6 +173,10 @@
                       <mat-icon>visibility</mat-icon>
                       <span>View Application</span>
                     </button>
+                    <button mat-menu-item (click)="onViewApplicationStatus(application)">
+                      <mat-icon>account_tree</mat-icon>
+                      <span>View Status</span>
+                    </button>
                   </ng-template>
                 </mat-menu>
               </div>
@@ -179,48 +193,47 @@
                   <table class="table table-bordered table-hover">
                     <thead>
                       <tr>
-                        <th>Permit Number</th>
-                        <th>Permit Type</th>
+                        <th>Application Code</th>
+                        <th>Application Name</th>
                         <th>University</th>
                         <th>Status</th>
-                        <th>Issue Date</th>
-                        <th>Expiry Date</th>
+                        <th>Accepted Date</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr *ngFor="let permit of myPermits">
-                        <td>{{ permit.permitNumber }}</td>
-                        <td>{{ permit.permitType }}</td>
+                        <td>{{ permit.applicationCode }}</td>
+                        <td>{{ permit.applicationName }}</td>
                         <td>{{ permit.universityName || '-' }}</td>
                         <td>
                           <span class="badge" [ngClass]="getStatusBadgeClass(permit.status)">
                             {{ permit.status }}
                           </span>
                         </td>
-                        <td>{{ permit.issueDate | date:'shortDate' }}</td>
-                        <td>{{ permit.expiryDate | date:'shortDate' }}</td>
+                        <td>{{ permit.createdAt | date:'shortDate' }}</td>
                         <td>
-                          <button mat-icon-button color="primary" title="View">
+                          <button mat-icon-button
+                                  color="primary"
+                                  title="Actions"
+                                  [matMenuTriggerFor]="myAppActionsMenu"
+                                  [matMenuTriggerData]="{ application: permit }">
                             <mat-icon>visibility</mat-icon>
-                          </button>
-                          <button mat-icon-button title="Download">
-                            <mat-icon>download</mat-icon>
                           </button>
                         </td>
                       </tr>
                       <tr *ngIf="(myPermits?.length ?? 0) === 0 && !permitsLoading">
-                        <td colspan="7" class="text-center text-muted">No permits found</td>
+                        <td colspan="6" class="text-center text-muted">No permits found</td>
                       </tr>
                       <tr *ngIf="permitsLoading">
-                        <td colspan="7" class="text-center text-muted">Loading permits...</td>
+                        <td colspan="6" class="text-center text-muted">Loading permits...</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-                
+
                 <!-- Pagination for My Permits -->
-                <mat-paginator 
+                <mat-paginator
                   [length]="permitsTotalElements || 0"
                   [pageSize]="permitsSize"
                   [pageSizeOptions]="[5, 10, 25, 50]"
@@ -268,7 +281,7 @@
       <!-- Tabs -->
       <div class="row" *ngIf="selectedUniversityId">
         <div class="col-12">
-          <mat-tab-group class="custom-tabs" (selectedTabChange)="onInternalTabChange($event)">
+          <mat-tab-group class="custom-tabs" [selectedIndex]="internalTabIndex" (selectedTabChange)="onInternalTabChange($event)">
 
             <!-- Applications Tab -->
             <mat-tab label="Applications">
@@ -335,6 +348,10 @@
                     <button mat-menu-item (click)="onViewApplication(application)">
                       <mat-icon>visibility</mat-icon>
                       <span>View Application</span>
+                    </button>
+                    <button mat-menu-item (click)="onViewApplicationStatus(application)">
+                      <mat-icon>account_tree</mat-icon>
+                      <span>View Status</span>
                     </button>
                   </ng-template>
                 </mat-menu>
@@ -412,25 +429,37 @@
                         <th>Function</th>
                         <th>Task</th>
                         <th>Application Number</th>
-                        <th>Application Name (Project Title)</th>
-                        <th>Issuing Office</th>
+                        <th>Application Name</th>
+                        <th>Task State</th>
+                        <th>Assigned To</th>
                         <th>Type</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr *ngFor="let task of availableTasks">
-                        <td>{{ task.function }}</td>
-                        <td>{{ task.task }}</td>
+                        <td>
+                          <button mat-raised-button
+                                  color="primary"
+                                  class="assign-task-button"
+                                  [disabled]="isAvailableTaskActionDisabled(task)"
+                                  [matTooltip]="isAvailableTaskActionDisabled(task) ? 'This task is already assigned to you' : ''"
+                                  (click)="onAvailableTaskAction(task)">
+                            <mat-icon>{{ task.assigneeId ? 'swap_horiz' : 'person_add' }}</mat-icon>
+                            {{ getAvailableTaskActionLabel(task) }}
+                          </button>
+                        </td>
+                        <td>{{ task.name }}</td>
                         <td>{{ task.applicationNumber }}</td>
                         <td>{{ task.applicationName }}</td>
-                        <td>{{ task.issuingOffice }}</td>
-                        <td>{{ task.type }}</td>
+                        <td></td>
+                        <td>{{ task.assignee || '' }}</td>
+                        <td>{{ task.processName }}</td>
                       </tr>
                       <tr *ngIf="(availableTasks?.length ?? 0) === 0 && !availableTasksLoading">
-                        <td colspan="6" class="text-center text-muted">No available tasks</td>
+                        <td colspan="7" class="text-center text-muted">No available tasks</td>
                       </tr>
                       <tr *ngIf="availableTasksLoading">
-                        <td colspan="6" class="text-center text-muted">Loading available tasks...</td>
+                        <td colspan="7" class="text-center text-muted">Loading available tasks...</td>
                       </tr>
                     </tbody>
                   </table>
@@ -461,25 +490,40 @@
                         <th>Function</th>
                         <th>Task</th>
                         <th>Application Number</th>
-                        <th>Application Name (Project Title)</th>
-                        <th>Issuing Office</th>
+                        <th>Application Name</th>
                         <th>Type</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr *ngFor="let task of myInternalTasks">
-                        <td>{{ task.function }}</td>
-                        <td>{{ task.task }}</td>
+                        <td>
+                          <button mat-raised-button
+                                  color="primary"
+                                  class="complete-task-button me-2"
+                                  [disabled]="!task.applicationId"
+                                  [matTooltip]="!task.applicationId ? 'This task is not linked to an application record' : ''"
+                                  (click)="onOpenTask(task)">
+                            <mat-icon>task_alt</mat-icon>
+                            Complete
+                          </button>
+                          <button mat-raised-button
+                                  color="warn"
+                                  class="release-task-button"
+                                  (click)="onReleaseTask(task)">
+                            <mat-icon>undo</mat-icon>
+                            Release Task
+                          </button>
+                        </td>
+                        <td>{{ task.name }}</td>
                         <td>{{ task.applicationNumber }}</td>
                         <td>{{ task.applicationName }}</td>
-                        <td>{{ task.issuingOffice }}</td>
-                        <td>{{ task.type }}</td>
+                        <td>{{ task.processName }}</td>
                       </tr>
                       <tr *ngIf="(myInternalTasks?.length ?? 0) === 0 && !myInternalTasksLoading">
-                        <td colspan="6" class="text-center text-muted">No tasks assigned to you</td>
+                        <td colspan="5" class="text-center text-muted">No tasks assigned to you</td>
                       </tr>
                       <tr *ngIf="myInternalTasksLoading">
-                        <td colspan="6" class="text-center text-muted">Loading your tasks...</td>
+                        <td colspan="5" class="text-center text-muted">Loading your tasks...</td>
                       </tr>
                     </tbody>
                   </table>

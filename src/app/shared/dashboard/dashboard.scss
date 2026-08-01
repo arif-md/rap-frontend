@@ -42,6 +42,51 @@
     }
   }
 
+  // "Complete" action button on an Action Needed / My Tasks task row
+  .complete-task-button {
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: none;
+    line-height: 32px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+
+    &:hover:not([disabled]) {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    }
+  }
+
+  // "Release Task" / "Assign To Me" / "Takeover Task" action buttons on My Tasks and
+  // Available Tasks rows - same sizing as .complete-task-button, kept separate so each
+  // action's color (primary vs warn) is set via the Material `color` input, not here.
+  .release-task-button,
+  .assign-task-button {
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: none;
+    line-height: 32px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+
+    &:hover:not([disabled]) {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    }
+  }
+
   // User Info Label
   .user-info-label {
     font-size: 1rem;

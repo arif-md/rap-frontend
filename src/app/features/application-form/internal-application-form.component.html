@@ -2,13 +2,11 @@
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-lg-8 col-md-10">
-        
+
         <!-- Page Header -->
         <div class="page-header mt-4 mb-4">
-          <h2 class="page-title" *ngIf="mode === 'create'">University Admission Application - Module 1</h2>
-          <p class="page-subtitle" *ngIf="mode === 'create'">Please fill in all required fields to submit your application</p>
-          <h2 class="page-title" *ngIf="mode === 'task'">Application</h2>
-          <p class="page-subtitle" *ngIf="mode === 'task'">Review the application, then save your changes or complete the task</p>
+          <h2 class="page-title">Application Review</h2>
+          <p class="page-subtitle">Review the application, sign below, then save your changes or complete the task</p>
         </div>
 
         <!-- Error Alert -->
@@ -23,7 +21,7 @@
           {{ successMessage }}
         </div>
 
-        <!-- Loading existing application (task mode) -->
+        <!-- Loading existing application -->
         <div class="text-center my-5" *ngIf="isLoadingApplication">
           <mat-spinner diameter="40" class="mx-auto"></mat-spinner>
           <p class="mt-3">Loading application...</p>
@@ -32,12 +30,12 @@
         <!-- Application Form Card -->
         <mat-card class="application-card" *ngIf="!isLoadingApplication">
           <mat-card-content>
-            <form [formGroup]="applicationForm" (ngSubmit)="onFormSubmit()" class="application-form">
-              
+            <form [formGroup]="applicationForm" class="application-form">
+
               <!-- Application Name -->
               <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Application Name / Project Title</mat-label>
-                <input matInput 
+                <input matInput
                        formControlName="applicationName"
                        placeholder="Enter application or project title"
                        required>
@@ -73,7 +71,7 @@
                 <div class="col-md-6">
                   <mat-form-field appearance="outline" class="full-width">
                     <mat-label>First Name</mat-label>
-                    <input matInput 
+                    <input matInput
                            formControlName="firstName"
                            placeholder="Enter first name"
                            required>
@@ -83,7 +81,7 @@
                 <div class="col-md-6">
                   <mat-form-field appearance="outline" class="full-width">
                     <mat-label>Last Name</mat-label>
-                    <input matInput 
+                    <input matInput
                            formControlName="lastName"
                            placeholder="Enter last name"
                            required>
@@ -97,7 +95,7 @@
                 <div class="col-md-6">
                   <mat-form-field appearance="outline" class="full-width">
                     <mat-label>Email Address</mat-label>
-                    <input matInput 
+                    <input matInput
                            type="email"
                            formControlName="email"
                            placeholder="Enter email address"
@@ -109,7 +107,7 @@
                 <div class="col-md-6">
                   <mat-form-field appearance="outline" class="full-width">
                     <mat-label>Phone Number</mat-label>
-                    <input matInput 
+                    <input matInput
                            formControlName="phone"
                            placeholder="Enter phone number"
                            required>
@@ -137,7 +135,7 @@
               <!-- Description -->
               <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Additional Information (Optional)</mat-label>
-                <textarea matInput 
+                <textarea matInput
                           formControlName="description"
                           placeholder="Any additional information you'd like to provide"
                           rows="4"
@@ -147,39 +145,49 @@
                 </mat-hint>
               </mat-form-field>
 
-              <!-- Form Actions: create mode (new application) -->
-              <div class="form-actions" *ngIf="mode === 'create'">
-                <button mat-raised-button
-                        type="button"
-                        class="cancel-button"
-                        (click)="onCancel()"
-                        [disabled]="isSubmitting || isSaving">
-                  Cancel
-                </button>
+              <!-- Internal Review Section -->
+              <h3 class="section-title">Internal Review</h3>
 
-                <button mat-raised-button
-                        type="button"
-                        class="save-button"
-                        (click)="onSave()"
-                        [disabled]="isSubmitting || isSaving">
-                  <mat-spinner *ngIf="isSaving" diameter="20" class="button-spinner"></mat-spinner>
-                  <span *ngIf="!isSaving">Save</span>
-                  <span *ngIf="isSaving">Saving...</span>
-                </button>
-
-                <button mat-raised-button
-                        color="primary"
-                        type="submit"
-                        class="submit-button"
-                        [disabled]="isSubmitting || isSaving">
-                  <mat-spinner *ngIf="isSubmitting" diameter="20" class="button-spinner"></mat-spinner>
-                  <span *ngIf="!isSubmitting">Submit Application</span>
-                  <span *ngIf="isSubmitting">Submitting...</span>
-                </button>
+              <div class="review-date-field">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Review Date</mat-label>
+                  <input matInput
+                         type="date"
+                         [value]="reviewDate"
+                         (change)="onReviewDateChange($event)"
+                         required>
+                </mat-form-field>
               </div>
 
-              <!-- Form Actions: task mode (opened from the Action Needed tab) -->
-              <div class="form-actions" *ngIf="mode === 'task'">
+              <div class="signature-section">
+                <label class="signature-label">Signature</label>
+                <p class="signature-instructions">
+                  Press and hold inside the box, then drag to draw your signature - with a mouse, trackpad, touchscreen, or stylus.
+                </p>
+                <div class="signature-pad-wrapper">
+                  <canvas #signatureCanvas
+                          class="signature-canvas"
+                          width="600"
+                          height="150"
+                          (pointerdown)="startDrawing($event)"
+                          (pointermove)="draw($event)"
+                          (pointerup)="stopDrawing($event)"
+                          (pointerleave)="stopDrawing($event)"
+                          (pointercancel)="stopDrawing($event)">
+                  </canvas>
+                  <div class="signature-placeholder" *ngIf="!hasSignature">Sign here</div>
+                </div>
+                <div class="signature-actions">
+                  <button mat-stroked-button type="button" class="clear-signature-button" (click)="clearSignature()">
+                    <mat-icon>backspace</mat-icon>
+                    Clear
+                  </button>
+                  <span class="signature-hint" *ngIf="!hasSignature">Your signature is required to complete this task.</span>
+                </div>
+              </div>
+
+              <!-- Form Actions -->
+              <div class="form-actions">
                 <button mat-raised-button
                         type="button"
                         class="cancel-button"
@@ -203,7 +211,8 @@
                         type="button"
                         class="submit-button"
                         (click)="onComplete()"
-                        [disabled]="isSaving || isCompleting">
+                        [disabled]="!canComplete"
+                        [matTooltip]="!hasSignature ? 'Sign above to enable Complete' : ''">
                   <mat-spinner *ngIf="isCompleting" diameter="20" class="button-spinner"></mat-spinner>
                   <span *ngIf="!isCompleting">Complete</span>
                   <span *ngIf="isCompleting">Completing...</span>

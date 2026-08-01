@@ -55,4 +55,31 @@ export class ApplicationSubmissionService {
 
     return this.http.post<ApplicationSubmissionResponse>(url, request);
   }
+
+  /**
+   * Complete the jBPM task associated with an application, e.g. from the dashboard's
+   * "Action Needed" tab.
+   */
+  completeTask(taskId: number, containerId: string): Observable<void> {
+    const url = `${this.baseUrl}/api/workflow/myActiveTasks/${taskId}/complete?containerId=${encodeURIComponent(containerId)}`;
+
+    return this.http.post<void>(url, null);
+  }
+
+  /**
+   * Complete the jBPM task associated with an application from the internal application
+   * review page ("My Tasks" -> Complete), recording the reviewer's signature and review
+   * date server-side first.
+   */
+  completeTaskWithReview(
+    taskId: number,
+    containerId: string,
+    applicationId: number,
+    reviewDate: string,
+    signatureImage: string
+  ): Observable<void> {
+    const url = `${this.baseUrl}/api/workflow/myActiveTasks/${taskId}/completeWithReview?containerId=${encodeURIComponent(containerId)}`;
+
+    return this.http.post<void>(url, { applicationId, reviewDate, signatureImage });
+  }
 }

@@ -5,6 +5,7 @@ import { LoginComponent } from '@app/shared/login/login.component';
 import { AuthCallbackComponent } from '@app/shared/auth-callback/auth-callback.component';
 import { Dashboard } from '@app/shared/dashboard/dashboard';
 import { ApplicationFormComponent } from '@app/features/application-form/application-form.component';
+import { InternalApplicationFormComponent } from '@app/features/application-form/internal-application-form.component';
 import { ApplicationViewComponent } from '@app/features/application-view/application-view.component';
 
 import {
@@ -33,7 +34,7 @@ import {
 } from '@app/shared/model';
 
 import { DefaultPathGuard } from '@app/shared/helpers';
-import { authGuard, externalGuard } from '@app/shared/guards/auth.guard';
+import { authGuard, externalGuard, internalGuard } from '@app/shared/guards/auth.guard';
 import { UnauthorizedComponent } from '@app/shared/unauthorized/unauthorized.component';
 
 export const routes: Routes = [
@@ -50,6 +51,8 @@ export const routes: Routes = [
   { path: PATH_DASHBOARD, title: 'Dashboard', component: Dashboard, canActivate: [authGuard] },
   // Application form is for external users only
   { path: 'application-form', title: 'Application Form', component: ApplicationFormComponent, canActivate: [externalGuard] },
+  // Internal-user counterpart, reached from the dashboard's "My Tasks" Complete button
+  { path: 'internal-application-form', title: 'Application Review', component: InternalApplicationFormComponent, canActivate: [internalGuard] },
   // Read-only application view, reached from the dashboard's "View Application" action
   { path: 'application-view/:id', title: 'View Application', component: ApplicationViewComponent, canActivate: [authGuard] },
 

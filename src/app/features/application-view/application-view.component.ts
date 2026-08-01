@@ -57,6 +57,10 @@ export class ApplicationViewComponent implements OnInit {
   }
 
   onDashboard(): void {
-    this.router.navigate(['/dashboard']);
+    // Forward the university/tab we arrived with so the dashboard can restore
+    // the same selection instead of resetting to its defaults.
+    this.router.navigate(['/dashboard'], {
+      queryParams: this.route.snapshot.queryParams
+    });
   }
 }

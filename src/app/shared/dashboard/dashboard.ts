@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatTabsModule, MatTabChangeEvent } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,6 +10,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { AuthenticationService, AppConfigService } from '@app/global-services';
 import { User } from '@app/shared/model/admin/user';
@@ -26,11 +27,18 @@ interface PageResponse<T> {
 
 interface Task {
   id: number;
+  name?: string;
+  containerId?: string;
+  applicationId?: number;
   function: string;
   task: string;
   applicationNumber: string;
   applicationName: string;
   issuingOffice: string;
+  universityName?: string;
+  assignee?: string;
+  assigneeId?: string;
+  processName?: string;
   type: string;
   status: string;
 }
@@ -78,7 +86,8 @@ interface University {
     MatTableModule,
     MatChipsModule,
     MatMenuModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatTooltipModule
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
@@ -89,7 +98,9 @@ export class Dashboard implements OnInit {
   // Tab data
   actionNeededTasks: Task[] = [];
   myApplications: Application[] = [];
-  myPermits: Permit[] = [];
+  // "My Permits" is backed by the same /api/applications shape - an application becomes
+  // a permit once its latest workflow status is ACCEPTED (see dashboard's PermitController).
+  myPermits: Application[] = [];
 
   // Pagination state for Tasks
   tasksPage = 0;
@@ -153,11 +164,25 @@ export class Dashboard implements OnInit {
     private authService: AuthenticationService,
     private appConfigService: AppConfigService,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     console.log('[Dashboard] ngOnInit called');
+
+    // Restore the tab/university selected before navigating away to "View Application",
+    // passed back as query params so re-entering the dashboard doesn't reset the view.
+    const queryParamMap = this.route.snapshot.queryParamMap;
+    const universityIdParam = queryParamMap.get('universityId');
+    const tabParam = queryParamMap.get('tab');
+    if (universityIdParam !== null) {
+      this.selectedUniversityId = Number(universityIdParam);
+      this.internalTabIndex = tabParam !== null ? Number(tabParam) : 0;
+    } else if (tabParam !== null) {
+      this.selectedTabIndex = Number(tabParam);
+    }
+
     this.authService.currentUser.subscribe((user: User | null) => {
       console.log('[Dashboard] currentUser subscription fired:', {
         hasUser: !!user,
@@ -168,9 +193,9 @@ export class Dashboard implements OnInit {
       this.currentUser = user;
       if (user) {
         if (user.isExternalUser) {
-          // External user: load tasks for first tab
-          console.log('[Dashboard] External user detected, loading tasks');
-          this.loadTasks();
+          // External user: load data for the restored (or default) tab
+          console.log('[Dashboard] External user detected, loading tab data');
+          this.loadExternalTabData(this.selectedTabIndex);
         } else {
           // Internal user: load university list
           console.log('[Dashboard] Internal user detected, loading universities');
@@ -188,9 +213,11 @@ export class Dashboard implements OnInit {
 
   onTabChange(event: MatTabChangeEvent): void {
     this.selectedTabIndex = event.index;
-    
-    // Load data based on selected tab
-    switch (event.index) {
+    this.loadExternalTabData(event.index);
+  }
+
+  private loadExternalTabData(tabIndex: number): void {
+    switch (tabIndex) {
       case 0:
         this.loadTasks();
         break;
@@ -208,7 +235,7 @@ export class Dashboard implements OnInit {
     
     this.tasksLoading = true;
     const apiBaseUrl = this.getApiBaseUrl();
-    const url = `${apiBaseUrl}/api/workflow/tasks?page=${this.tasksPage}&size=${this.tasksSize}`;
+    const url = `${apiBaseUrl}/api/workflow/myActiveTasks?page=${this.tasksPage}&size=${this.tasksSize}`;
     
     this.http.get<PageResponse<Task>>(url, { withCredentials: true }).subscribe({
       next: (response) => {
@@ -253,8 +280,8 @@ export class Dashboard implements OnInit {
     this.permitsLoading = true;
     const apiBaseUrl = this.getApiBaseUrl();
     const url = `${apiBaseUrl}/api/permits/my?page=${this.permitsPage}&size=${this.permitsSize}`;
-    
-    this.http.get<PageResponse<Permit>>(url, { withCredentials: true }).subscribe({
+
+    this.http.get<PageResponse<Application>>(url, { withCredentials: true }).subscribe({
       next: (response) => {
         this.myPermits = response.content;
         this.permitsTotalElements = response.totalElements;
@@ -316,9 +343,61 @@ export class Dashboard implements OnInit {
     }
   }
 
-  // Actions menu (eye icon) on an application row
+  // Actions menu (eye icon) on an application row - passes the currently selected
+  // university/tab as query params so the dashboard can restore them on return.
   onViewApplication(application: Application): void {
-    this.router.navigate(['/application-view', application.id]);
+    const queryParams: { universityId?: number; tab?: number } = {};
+    if (this.currentUser && !this.currentUser.isExternalUser) {
+      queryParams.universityId = this.selectedUniversityId ?? undefined;
+      queryParams.tab = this.internalTabIndex;
+    } else {
+      queryParams.tab = this.selectedTabIndex;
+    }
+    this.router.navigate(['/application-view', application.id], { queryParams });
+  }
+
+  // "View Status" action - fetches the jBPM process instance diagram (SVG, active
+  // node highlighted) and opens it in a new browser tab.
+  onViewApplicationStatus(application: Application): void {
+    const apiBaseUrl = this.getApiBaseUrl();
+    const url = `${apiBaseUrl}/api/applications/${application.id}/status-image`;
+
+    this.http.get(url, { withCredentials: true, responseType: 'blob' }).subscribe({
+      next: (svgBlob) => {
+        const objectUrl = URL.createObjectURL(svgBlob);
+        window.open(objectUrl, '_blank');
+      },
+      error: (error) => {
+        console.error('Error loading process status image:', error);
+        this.handleAuthError(error);
+        alert('Unable to load process status for this application. It may not have an active workflow yet.');
+      }
+    });
+  }
+
+  // "Complete" button on an Action Needed task row - opens the reusable application
+  // form in task mode (Dashboard/Save/Complete buttons) for the task's application.
+  // Shared by the "Complete" button on both the external "Action Needed" tab and the
+  // internal "My Tasks" tab - routes to whichever application-form variant matches the
+  // current user (internal users get the review page with the signature/date section).
+  onOpenTask(task: Task): void {
+    if (!task.applicationId) {
+      return;
+    }
+    const isExternal = !!this.currentUser?.isExternalUser;
+    const route = isExternal ? '/application-form' : '/internal-application-form';
+    const queryParams: { applicationId: number; taskId: number | null; containerId?: string; universityId?: number; tab?: number } = {
+      applicationId: task.applicationId,
+      taskId: task.id,
+      containerId: task.containerId
+    };
+    if (!isExternal) {
+      // So "Dashboard"/"Complete" on the internal review page can return here with the
+      // same university/tab selected, instead of resetting to the university picker.
+      queryParams.universityId = this.selectedUniversityId ?? undefined;
+      queryParams.tab = this.internalTabIndex;
+    }
+    this.router.navigate([route], { queryParams });
   }
 
   // Navigation methods for module buttons
@@ -347,6 +426,10 @@ export class Dashboard implements OnInit {
       next: (universities) => {
         console.log('[Dashboard] Universities loaded:', universities?.length, 'items');
         this.universities = universities;
+        // If a university/tab was restored from query params, load that tab's data now
+        if (this.selectedUniversityId) {
+          this.loadInternalTabData(this.internalTabIndex);
+        }
       },
       error: (error) => {
         console.error('[Dashboard] Error loading universities:', error.status, error.message);
@@ -432,10 +515,10 @@ export class Dashboard implements OnInit {
   }
 
   loadAvailableTasks(): void {
-    if (this.availableTasksLoading) return;
+    if (this.availableTasksLoading || !this.selectedUniversityId) return;
     this.availableTasksLoading = true;
     const apiBaseUrl = this.getApiBaseUrl();
-    const url = `${apiBaseUrl}/api/workflow/tasks/available?page=${this.availableTasksPage}&size=${this.availableTasksSize}`;
+    const url = `${apiBaseUrl}/api/workflow/myUniversityTasks?officeid=${this.selectedUniversityId}&page=${this.availableTasksPage}&size=${this.availableTasksSize}`;
 
     this.http.get<PageResponse<Task>>(url, { withCredentials: true }).subscribe({
       next: (response) => {
@@ -456,7 +539,7 @@ export class Dashboard implements OnInit {
     if (this.myInternalTasksLoading) return;
     this.myInternalTasksLoading = true;
     const apiBaseUrl = this.getApiBaseUrl();
-    const url = `${apiBaseUrl}/api/workflow/tasks/my?page=${this.myInternalTasksPage}&size=${this.myInternalTasksSize}`;
+    const url = `${apiBaseUrl}/api/workflow/myActiveTasks?page=${this.myInternalTasksPage}&size=${this.myInternalTasksSize}`;
 
     this.http.get<PageResponse<Task>>(url, { withCredentials: true }).subscribe({
       next: (response) => {
@@ -491,9 +574,75 @@ export class Dashboard implements OnInit {
     this.loadAvailableTasks();
   }
 
+  // Available Tasks row action button - "Assign To Me" when nobody owns the task yet,
+  // otherwise "Takeover Task" (disabled if the current user already owns it).
+  getAvailableTaskActionLabel(task: Task): string {
+    return task.assigneeId ? 'Takeover Task' : 'Assign To Me';
+  }
+
+  isAvailableTaskActionDisabled(task: Task): boolean {
+    return !!task.assigneeId && this.isCurrentUser(task.assigneeId);
+  }
+
+  private isCurrentUser(assigneeId: string): boolean {
+    return this.currentUser?.id != null && String(this.currentUser.id) === String(assigneeId);
+  }
+
+  onAvailableTaskAction(task: Task): void {
+    if (task.assigneeId) {
+      this.onTakeoverTask(task);
+    } else {
+      this.onAssignToMe(task);
+    }
+  }
+
+  private onAssignToMe(task: Task): void {
+    const apiBaseUrl = this.getApiBaseUrl();
+    const url = `${apiBaseUrl}/api/workflow/startTask?containerId=${encodeURIComponent(task.containerId ?? '')}&taskId=${task.id}`;
+
+    this.http.delete<boolean>(url, { withCredentials: true }).subscribe({
+      next: () => this.loadAvailableTasks(),
+      error: (error) => {
+        console.error('Error assigning task to self:', error);
+        this.handleAuthError(error);
+        alert('Unable to assign this task to you. Please try again.');
+      }
+    });
+  }
+
+  private onTakeoverTask(task: Task): void {
+    const apiBaseUrl = this.getApiBaseUrl();
+    const url = `${apiBaseUrl}/api/workflow/takeoverTask?containerId=${encodeURIComponent(task.containerId ?? '')}&taskId=${task.id}`;
+
+    this.http.delete<boolean>(url, { withCredentials: true }).subscribe({
+      next: () => this.loadAvailableTasks(),
+      error: (error) => {
+        console.error('Error taking over task:', error);
+        this.handleAuthError(error);
+        alert('Unable to take over this task. Please try again.');
+      }
+    });
+  }
+
   onMyInternalTasksPageChange(event: PageEvent): void {
     this.myInternalTasksPage = event.pageIndex;
     this.myInternalTasksSize = event.pageSize;
     this.loadMyInternalTasks();
+  }
+
+  // "Release Task" action on a My Tasks row - hands the task back to the pool (clears
+  // actualOwner) so anyone else in the potential-owner group can pick it up.
+  onReleaseTask(task: Task): void {
+    const apiBaseUrl = this.getApiBaseUrl();
+    const url = `${apiBaseUrl}/api/workflow/releaseTask?containerId=${encodeURIComponent(task.containerId ?? '')}&taskId=${task.id}`;
+
+    this.http.delete<boolean>(url, { withCredentials: true }).subscribe({
+      next: () => this.loadMyInternalTasks(),
+      error: (error) => {
+        console.error('Error releasing task:', error);
+        this.handleAuthError(error);
+        alert('Unable to release this task. Please try again.');
+      }
+    });
   }
 }

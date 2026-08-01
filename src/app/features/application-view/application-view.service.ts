@@ -37,7 +37,7 @@ export class ApplicationViewService {
    * Token authentication is automatically handled by HTTP interceptor.
    */
   getApplication(id: number): Observable<ApplicationDetail> {
-    const url = `${this.baseUrl}/api/dashboard/applications/${id}`;
+    const url = `${this.baseUrl}/api/applications/${id}`;
     return this.http.get<ApplicationDetail>(url, { withCredentials: true });
   }
 }
