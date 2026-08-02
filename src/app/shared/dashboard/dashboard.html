@@ -369,27 +369,31 @@
                   <table class="table table-bordered table-hover">
                     <thead>
                       <tr>
-                        <th>Permit Number</th>
-                        <th>Permit Type</th>
+                        <th>Application Code</th>
+                        <th>Application Name</th>
+                        <th>Owner</th>
                         <th>Status</th>
-                        <th>Issue Date</th>
-                        <th>Expiry Date</th>
+                        <th>Accepted Date</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr *ngFor="let permit of uniPermits">
-                        <td>{{ permit.permitNumber }}</td>
-                        <td>{{ permit.permitType }}</td>
+                        <td>{{ permit.applicationCode }}</td>
+                        <td>{{ permit.applicationName }}</td>
+                        <td>{{ permit.ownerName || permit.ownerEmail }}</td>
                         <td>
                           <span class="badge" [ngClass]="getStatusBadgeClass(permit.status)">
                             {{ permit.status }}
                           </span>
                         </td>
-                        <td>{{ permit.issueDate | date:'shortDate' }}</td>
-                        <td>{{ permit.expiryDate | date:'shortDate' }}</td>
+                        <td>{{ permit.createdAt | date:'shortDate' }}</td>
                         <td>
-                          <button mat-icon-button color="primary" title="View">
+                          <button mat-icon-button
+                                  color="primary"
+                                  title="Actions"
+                                  [matMenuTriggerFor]="uniAppActionsMenu"
+                                  [matMenuTriggerData]="{ application: permit }">
                             <mat-icon>visibility</mat-icon>
                           </button>
                         </td>

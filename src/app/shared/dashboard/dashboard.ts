@@ -56,17 +56,6 @@ interface Application {
   createdAt: string;
 }
 
-interface Permit {
-  id: number;
-  permitNumber: string;
-  permitType: string;
-  status: string;
-  issueDate: string;
-  expiryDate: string;
-  universityId?: number;
-  universityName?: string;
-}
-
 interface University {
   id: number;
   universityName: string;
@@ -139,8 +128,10 @@ export class Dashboard implements OnInit {
   uniApplicationsTotalElements = 0;
   uniApplicationsLoading = false;
 
-  // University Permits
-  uniPermits: Permit[] = [];
+  // University Permits - backed by the same /api/applications shape as uniApplications: an
+  // application becomes a permit once its latest workflow status is ACCEPTED
+  // (see PermitController.getPermitsByUniversity).
+  uniPermits: Application[] = [];
   uniPermitsPage = 0;
   uniPermitsSize = 10;
   uniPermitsTotalElements = 0;
@@ -499,7 +490,7 @@ export class Dashboard implements OnInit {
     const apiBaseUrl = this.getApiBaseUrl();
     const url = `${apiBaseUrl}/api/permits/university/${this.selectedUniversityId}?page=${this.uniPermitsPage}&size=${this.uniPermitsSize}`;
 
-    this.http.get<PageResponse<Permit>>(url, { withCredentials: true }).subscribe({
+    this.http.get<PageResponse<Application>>(url, { withCredentials: true }).subscribe({
       next: (response) => {
         this.uniPermits = response.content;
         this.uniPermitsTotalElements = response.totalElements;
