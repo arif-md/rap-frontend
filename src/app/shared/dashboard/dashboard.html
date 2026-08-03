@@ -78,7 +78,7 @@
                         <td>{{ task.name }}</td>
                         <td>{{ task.applicationNumber }}</td>
                         <td>{{ task.applicationName }}</td>
-                        <td>{{ task.issuingOffice }}</td>
+                        <td>{{ task.universityName || '-' }}</td>
                         <td>{{ task.processName }}</td>
                       </tr>
                       <tr *ngIf="(actionNeededTasks?.length ?? 0) === 0 && !tasksLoading">
@@ -176,6 +176,10 @@
                     <button mat-menu-item (click)="onViewApplicationStatus(application)">
                       <mat-icon>account_tree</mat-icon>
                       <span>View Status</span>
+                    </button>
+                    <button mat-menu-item (click)="onViewAttachments(application)">
+                      <mat-icon>attach_file</mat-icon>
+                      <span>Attachments</span>
                     </button>
                   </ng-template>
                 </mat-menu>
@@ -352,6 +356,10 @@
                     <button mat-menu-item (click)="onViewApplicationStatus(application)">
                       <mat-icon>account_tree</mat-icon>
                       <span>View Status</span>
+                    </button>
+                    <button mat-menu-item (click)="onViewAttachments(application)">
+                      <mat-icon>attach_file</mat-icon>
+                      <span>Attachments</span>
                     </button>
                   </ng-template>
                 </mat-menu>

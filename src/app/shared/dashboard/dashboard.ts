@@ -11,9 +11,11 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { AuthenticationService, AppConfigService } from '@app/global-services';
 import { User } from '@app/shared/model/admin/user';
+import { AttachmentsDialogComponent } from '@app/shared/attachments/attachments-dialog.component';
 
 interface PageResponse<T> {
   content: T[];
@@ -76,7 +78,8 @@ interface University {
     MatChipsModule,
     MatMenuModule,
     MatPaginatorModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatDialogModule
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
@@ -156,7 +159,8 @@ export class Dashboard implements OnInit {
     private appConfigService: AppConfigService,
     private http: HttpClient,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -363,6 +367,16 @@ export class Dashboard implements OnInit {
         this.handleAuthError(error);
         alert('Unable to load process status for this application. It may not have an active workflow yet.');
       }
+    });
+  }
+
+  // "Attachments" action - opens a dialog listing files (e.g. generated PDFs) attached to
+  // this application; row click in the dialog downloads the file.
+  onViewAttachments(application: Application): void {
+    this.dialog.open(AttachmentsDialogComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      data: { applicationId: application.id }
     });
   }
 
