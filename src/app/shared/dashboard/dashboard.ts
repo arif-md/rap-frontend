@@ -90,9 +90,10 @@ export class Dashboard implements OnInit {
   // Tab data
   actionNeededTasks: Task[] = [];
   myApplications: Application[] = [];
-  // "My Permits" is backed by the same /api/applications shape - an application becomes
-  // a permit once its latest workflow status is ACCEPTED (see dashboard's PermitController).
-  myPermits: Application[] = [];
+  // "My Admissions" is backed by the same /api/applications shape - an application becomes
+  // an admission once its latest workflow status is ACCEPTED (see ApplicationController's
+  // /my/admissions endpoint).
+  myAdmissions: Application[] = [];
 
   // Pagination state for Tasks
   tasksPage = 0;
@@ -106,11 +107,11 @@ export class Dashboard implements OnInit {
   applicationsTotalElements = 0;
   applicationsLoading = false;
 
-  // Pagination state for Permits
-  permitsPage = 0;
-  permitsSize = 10;
-  permitsTotalElements = 0;
-  permitsLoading = false;
+  // Pagination state for Admissions
+  admissionsPage = 0;
+  admissionsSize = 10;
+  admissionsTotalElements = 0;
+  admissionsLoading = false;
 
   // Currently selected tab index
   selectedTabIndex = 0;
@@ -131,14 +132,14 @@ export class Dashboard implements OnInit {
   uniApplicationsTotalElements = 0;
   uniApplicationsLoading = false;
 
-  // University Permits - backed by the same /api/applications shape as uniApplications: an
-  // application becomes a permit once its latest workflow status is ACCEPTED
-  // (see PermitController.getPermitsByUniversity).
-  uniPermits: Application[] = [];
-  uniPermitsPage = 0;
-  uniPermitsSize = 10;
-  uniPermitsTotalElements = 0;
-  uniPermitsLoading = false;
+  // University Admissions - backed by the same /api/applications shape as uniApplications: an
+  // application becomes an admission once its latest workflow status is ACCEPTED
+  // (see ApplicationController.getAdmissionsByUniversity).
+  uniAdmissions: Application[] = [];
+  uniAdmissionsPage = 0;
+  uniAdmissionsSize = 10;
+  uniAdmissionsTotalElements = 0;
+  uniAdmissionsLoading = false;
 
   // Available Tasks
   availableTasks: Task[] = [];
@@ -220,7 +221,7 @@ export class Dashboard implements OnInit {
         this.loadApplications();
         break;
       case 2:
-        this.loadPermits();
+        this.loadAdmissions();
         break;
     }
   }
@@ -269,24 +270,24 @@ export class Dashboard implements OnInit {
     });
   }
 
-  loadPermits(): void {
-    if (this.permitsLoading) return;
-    
-    this.permitsLoading = true;
+  loadAdmissions(): void {
+    if (this.admissionsLoading) return;
+
+    this.admissionsLoading = true;
     const apiBaseUrl = this.getApiBaseUrl();
-    const url = `${apiBaseUrl}/api/permits/my?page=${this.permitsPage}&size=${this.permitsSize}`;
+    const url = `${apiBaseUrl}/api/applications/my/admissions?page=${this.admissionsPage}&size=${this.admissionsSize}`;
 
     this.http.get<PageResponse<Application>>(url, { withCredentials: true }).subscribe({
       next: (response) => {
-        this.myPermits = response.content;
-        this.permitsTotalElements = response.totalElements;
-        this.permitsLoading = false;
+        this.myAdmissions = response.content;
+        this.admissionsTotalElements = response.totalElements;
+        this.admissionsLoading = false;
       },
       error: (error) => {
-        console.error('Error loading permits:', error);
+        console.error('Error loading admissions:', error);
         this.handleAuthError(error);
-        this.myPermits = [];
-        this.permitsLoading = false;
+        this.myAdmissions = [];
+        this.admissionsLoading = false;
       }
     });
   }
@@ -312,10 +313,10 @@ export class Dashboard implements OnInit {
     this.loadApplications();
   }
 
-  onPermitsPageChange(event: PageEvent): void {
-    this.permitsPage = event.pageIndex;
-    this.permitsSize = event.pageSize;
-    this.loadPermits();
+  onAdmissionsPageChange(event: PageEvent): void {
+    this.admissionsPage = event.pageIndex;
+    this.admissionsSize = event.pageSize;
+    this.loadAdmissions();
   }
 
   getStatusBadgeClass(status: string): string {
@@ -447,7 +448,7 @@ export class Dashboard implements OnInit {
     if (!this.selectedUniversityId) return;
     // Reset pagination for all tabs
     this.uniApplicationsPage = 0;
-    this.uniPermitsPage = 0;
+    this.uniAdmissionsPage = 0;
     this.availableTasksPage = 0;
     this.myInternalTasksPage = 0;
     // Load data for the currently selected internal tab
@@ -466,7 +467,7 @@ export class Dashboard implements OnInit {
         this.loadUniApplications();
         break;
       case 1:
-        this.loadUniPermits();
+        this.loadUniAdmissions();
         break;
       case 2:
         this.loadAvailableTasks();
@@ -498,23 +499,23 @@ export class Dashboard implements OnInit {
     });
   }
 
-  loadUniPermits(): void {
-    if (this.uniPermitsLoading || !this.selectedUniversityId) return;
-    this.uniPermitsLoading = true;
+  loadUniAdmissions(): void {
+    if (this.uniAdmissionsLoading || !this.selectedUniversityId) return;
+    this.uniAdmissionsLoading = true;
     const apiBaseUrl = this.getApiBaseUrl();
-    const url = `${apiBaseUrl}/api/permits/university/${this.selectedUniversityId}?page=${this.uniPermitsPage}&size=${this.uniPermitsSize}`;
+    const url = `${apiBaseUrl}/api/applications/university/${this.selectedUniversityId}/admissions?page=${this.uniAdmissionsPage}&size=${this.uniAdmissionsSize}`;
 
     this.http.get<PageResponse<Application>>(url, { withCredentials: true }).subscribe({
       next: (response) => {
-        this.uniPermits = response.content;
-        this.uniPermitsTotalElements = response.totalElements;
-        this.uniPermitsLoading = false;
+        this.uniAdmissions = response.content;
+        this.uniAdmissionsTotalElements = response.totalElements;
+        this.uniAdmissionsLoading = false;
       },
       error: (error) => {
-        console.error('Error loading university permits:', error);
+        console.error('Error loading university admissions:', error);
         this.handleAuthError(error);
-        this.uniPermits = [];
-        this.uniPermitsLoading = false;
+        this.uniAdmissions = [];
+        this.uniAdmissionsLoading = false;
       }
     });
   }
@@ -567,10 +568,10 @@ export class Dashboard implements OnInit {
     this.loadUniApplications();
   }
 
-  onUniPermitsPageChange(event: PageEvent): void {
-    this.uniPermitsPage = event.pageIndex;
-    this.uniPermitsSize = event.pageSize;
-    this.loadUniPermits();
+  onUniAdmissionsPageChange(event: PageEvent): void {
+    this.uniAdmissionsPage = event.pageIndex;
+    this.uniAdmissionsSize = event.pageSize;
+    this.loadUniAdmissions();
   }
 
   onAvailableTasksPageChange(event: PageEvent): void {

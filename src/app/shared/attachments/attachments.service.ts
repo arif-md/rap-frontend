@@ -19,7 +19,7 @@ export class AttachmentsService {
 
   /**
    * List attachments for an application (dashboard "Attachments" dialog, shared by the
-   * Applications and Permits tabs - a permit is just an application under the hood).
+   * Applications and Admissions tabs - an admission is just an application under the hood).
    */
   list(applicationId: number): Observable<Attachment[]> {
     const url = `${this.baseUrl}/api/applications/${applicationId}/attachments`;

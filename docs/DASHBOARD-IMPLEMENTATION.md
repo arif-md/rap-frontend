@@ -1,5 +1,12 @@
 # Dashboard Implementation Summary
 
+> **Superseded:** this is a historical implementation log. The "My Permits"/"Permits" tabs,
+> `Permit`/`PermitService`/`PermitHandler`/`PermitMapper`/`PermitController` classes, and
+> `/api/permits/*` endpoints described below were renamed to "Admissions" and folded into
+> `ApplicationController` (`/api/applications/my/admissions`,
+> `/api/applications/university/{id}/admissions`) - `RAP.permit` was dropped (Flyway `V11`).
+> Kept for historical context only; don't treat the class/endpoint names below as current.
+
 ## Overview
 Successfully implemented a complete dashboard with three tabs (Actions Needed, My Applications, My Permits), each with backend API integration and pagination support.
 
