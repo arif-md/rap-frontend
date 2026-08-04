@@ -19,82 +19,14 @@
   margin-bottom: 5rem;
 }
 
-// External User Dashboard
-.external-dashboard {
+// Shared styling between External and Internal dashboards
+.external-dashboard,
+.internal-dashboard {
   .page-title {
     font-size: 1.75rem;
     font-weight: 600;
     color: #333;
     margin-bottom: 1.5rem;
-  }
-
-  // Module Buttons
-  .module-button {
-    width: 100%;
-    height: 60px;
-    font-size: 1rem;
-    font-weight: 500;
-    text-transform: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-    
-    &:hover {
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
-    }
-  }
-
-  // "Complete" action button on an Action Needed / My Tasks task row
-  .complete-task-button {
-    font-size: 0.85rem;
-    font-weight: 500;
-    text-transform: none;
-    line-height: 32px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-
-    mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-      vertical-align: middle;
-      margin-right: 4px;
-    }
-
-    &:hover:not([disabled]) {
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
-    }
-  }
-
-  // "Release Task" / "Assign To Me" / "Takeover Task" action buttons on My Tasks and
-  // Available Tasks rows - same sizing as .complete-task-button, kept separate so each
-  // action's color (primary vs warn) is set via the Material `color` input, not here.
-  .release-task-button,
-  .assign-task-button {
-    font-size: 0.85rem;
-    font-weight: 500;
-    text-transform: none;
-    line-height: 32px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-
-    mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-      vertical-align: middle;
-      margin-right: 4px;
-    }
-
-    &:hover:not([disabled]) {
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
-    }
-  }
-
-  // User Info Label
-  .user-info-label {
-    font-size: 1rem;
-    color: #333;
-    
-    strong {
-      font-weight: 600;
-    }
   }
 
   // Custom Tab Styling
@@ -237,15 +169,80 @@
   }
 }
 
-// Internal User Dashboard
-.internal-dashboard {
-  .page-title {
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 1.5rem;
+// External User Dashboard
+.external-dashboard {
+  // Module Buttons
+  .module-button {
+    width: 100%;
+    height: 60px;
+    font-size: 1rem;
+    font-weight: 500;
+    text-transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+
+    &:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    }
   }
 
+  // "Complete" action button on an Action Needed / My Tasks task row
+  .complete-task-button {
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: none;
+    line-height: 32px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+
+    &:hover:not([disabled]) {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    }
+  }
+
+  // "Release Task" / "Assign To Me" / "Takeover Task" action buttons on My Tasks and
+  // Available Tasks rows - same sizing as .complete-task-button, kept separate so each
+  // action's color (primary vs warn) is set via the Material `color` input, not here.
+  .release-task-button,
+  .assign-task-button {
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: none;
+    line-height: 32px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+
+    &:hover:not([disabled]) {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    }
+  }
+
+  // User Info Label
+  .user-info-label {
+    font-size: 1rem;
+    color: #333;
+
+    strong {
+      font-weight: 600;
+    }
+  }
+}
+
+// Internal User Dashboard
+.internal-dashboard {
   // University Picklist
   .university-select {
     border: 1px solid #ced4da;
@@ -269,141 +266,6 @@
       color: #adb5bd;
     }
   }
-
-  // Reuse same tab styling as external
-  .custom-tabs {
-    ::ng-deep {
-      // Hide the default ink-bar underline indicator; the active tab now
-      // gets its own distinct "raised" styling instead.
-      .mdc-tab-indicator {
-        display: none;
-      }
-
-      .mat-mdc-tab-labels {
-        background-color: #e9ecef;
-        border-bottom: 2px solid #dee2e6;
-        gap: 2px;
-      }
-
-      .mat-mdc-tab {
-        min-width: 120px;
-        font-weight: 500;
-        color: #6c757d;
-        background-color: #e9ecef;
-        opacity: 0.75;
-        border: 1px solid transparent;
-        border-bottom: none;
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
-        margin-bottom: -2px;
-        transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
-
-        &:hover:not(.mdc-tab--active) {
-          background-color: #f1f3f5;
-          opacity: 1;
-        }
-
-        // Active tab: raised, "in front" of the other tabs and blended
-        // with the white content area directly below it.
-        &.mdc-tab--active {
-          background-color: #ffffff;
-          opacity: 1;
-          border: 1px solid #dee2e6;
-          border-bottom: 2px solid #ffffff;
-          box-shadow: 0 -3px 6px rgba(0, 0, 0, 0.08);
-          position: relative;
-          z-index: 1;
-
-          .mdc-tab__text-label {
-            color: #007bff;
-            font-weight: 700;
-          }
-        }
-      }
-
-      .mat-mdc-tab-body-wrapper {
-        background: white;
-        border: 1px solid #dee2e6;
-        border-top: none;
-        border-radius: 0 0 8px 8px;
-      }
-    }
-  }
-
-  .tab-content-wrapper {
-    padding: 1.5rem;
-  }
-
-  .filter-section {
-    .filter-input {
-      max-width: 300px;
-      border: 1px solid #ced4da;
-      border-radius: 4px;
-      padding: 0.5rem 0.75rem;
-      font-size: 0.9rem;
-
-      &:focus {
-        outline: none;
-        border-color: #007bff;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-      }
-    }
-  }
-
-  .table {
-    font-size: 0.9rem;
-    margin-bottom: 0;
-
-    thead {
-      background-color: #f8f9fa;
-
-      th {
-        font-weight: 600;
-        color: #495057;
-        border-bottom: 2px solid #dee2e6;
-        border-left: none;
-        border-right: none;
-        padding: 0.75rem;
-        white-space: nowrap;
-      }
-    }
-
-    tbody {
-      tr {
-        transition: background-color 0.15s ease;
-
-        &:hover {
-          background-color: #f8f9fa;
-        }
-
-        td {
-          padding: 0.75rem;
-          vertical-align: middle;
-          border-top: 1px solid #dee2e6;
-          border-left: none;
-          border-right: none;
-        }
-      }
-    }
-
-    &.table-bordered {
-      border-left: none;
-      border-right: none;
-      border-top: 1px solid #dee2e6;
-      border-bottom: 1px solid #dee2e6;
-
-      td, th {
-        border-left: none;
-        border-right: none;
-      }
-    }
-  }
-
-  .badge {
-    padding: 0.35em 0.65em;
-    font-size: 0.85rem;
-    font-weight: 500;
-  }
 }
 
 // Material Icon Buttons
@@ -421,11 +283,27 @@ button[mat-icon-button] {
 
 // Responsive
 @media (max-width: 768px) {
-  .external-dashboard {
+  .external-dashboard,
+  .internal-dashboard {
     .page-title {
       font-size: 1.5rem;
     }
 
+    .tab-content-wrapper {
+      padding: 1rem;
+    }
+
+    .table {
+      font-size: 0.85rem;
+
+      thead th,
+      tbody td {
+        padding: 0.5rem;
+      }
+    }
+  }
+
+  .external-dashboard {
     .module-button {
       height: 50px;
       font-size: 0.9rem;
@@ -434,43 +312,12 @@ button[mat-icon-button] {
     .user-info-label {
       font-size: 0.9rem;
     }
-
-    .tab-content-wrapper {
-      padding: 1rem;
-    }
-
-    .table {
-      font-size: 0.85rem;
-
-      thead th,
-      tbody td {
-        padding: 0.5rem;
-      }
-    }
-  }
-
-  .internal-dashboard {
-    .page-title {
-      font-size: 1.5rem;
-    }
-
-    .tab-content-wrapper {
-      padding: 1rem;
-    }
-
-    .table {
-      font-size: 0.85rem;
-
-      thead th,
-      tbody td {
-        padding: 0.5rem;
-      }
-    }
   }
 }
 
 @media (max-width: 576px) {
-  .external-dashboard {
+  .external-dashboard,
+  .internal-dashboard {
     .custom-tabs {
       ::ng-deep {
         .mat-mdc-tab {
@@ -489,22 +336,6 @@ button[mat-icon-button] {
   }
 
   .internal-dashboard {
-    .custom-tabs {
-      ::ng-deep {
-        .mat-mdc-tab {
-          min-width: 80px;
-          font-size: 0.85rem;
-          padding: 0 8px;
-        }
-      }
-    }
-
-    .filter-section {
-      .filter-input {
-        max-width: 100%;
-      }
-    }
-
     .university-select {
       width: 100%;
     }
